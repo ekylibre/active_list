@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    active-list (5.0.2)
+    active_list (6.0.0)
       code_string (>= 0.0.0)
       fastercsv (>= 1.5)
       i18n-complements
@@ -69,7 +69,7 @@ GEM
       thor (>= 0.18.1, < 2.0)
     rake (10.3.1)
     rubyzip (1.1.3)
-    sprockets (2.11.0)
+    sprockets (2.12.1)
       hike (~> 1.2)
       multi_json (~> 1.0)
       rack (~> 1.0)
@@ -91,5 +91,5 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  active-list!
+  active_list!
   sqlite3

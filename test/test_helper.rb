@@ -4,7 +4,7 @@ require 'pathname'
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
-require 'active-list'
+require 'active_list'
 dummy_path = Pathname.new(__FILE__).dirname.join("dummy")
 
 `cd #{dummy_path} && bundle exec rake db:migrate RAILS_ENV=test`

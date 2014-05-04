@@ -4,18 +4,18 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'active_list/version'
 
 Gem::Specification.new do |s|
-  s.name = "active-list"
+  s.name = "active_list"
   s.version = ActiveList::VERSION
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.author = "Brice Texier"
   s.email  = "burisu@oneiros.fr"
-  s.summary = "Easy tables in Rails app"
+  s.summary = "Simple interactive tables for Rails app"
   s.description = "Generates action methods to"+
     " provide clean tables."
   s.extra_rdoc_files = [ "LICENSE", "README.rdoc" ]
 
-  s.files = `git ls-files app lib locales VERSION LICENSE README.rdoc`.split("\n")
-  s.homepage = "http://github.com/burisu/active-list"
+  s.files = `git ls-files -z app lib locales VERSION LICENSE README.rdoc test`.split("\x0")
+  s.homepage = "http://github.com/burisu/active_list"
   s.license = "MIT"
   s.require_path = "lib"
 

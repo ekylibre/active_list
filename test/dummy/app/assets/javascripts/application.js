@@ -12,5 +12,5 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require active-list.jquery
+//= require active_list.jquery
 //= require jquery_ujs
