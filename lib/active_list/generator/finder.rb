@@ -97,7 +97,7 @@ module ActiveList
         code << '{' + conditions.collect{|key, value| key.to_s + ': ' + sanitize_condition(value)}.join(',') + '}'
       when Symbol # Method
         code << conditions.to_s + "(options)"
-      when Code
+      when CodeString
         code << "(" + conditions.gsub(/\s*\n\s*/, ';') + ")"
       when String
         code << conditions.inspect
@@ -126,7 +126,7 @@ module ActiveList
       #   # else
       #   value.inspect
       #   # end
-      # elsif value.is_a? Code
+      # elsif value.is_a? CodeString
       #   value.inspect
       # elsif value.is_a? String
       #   '"' + value.gsub('"', '\"') + '"'
