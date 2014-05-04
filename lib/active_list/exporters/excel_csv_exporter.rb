@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 # Register XCSV format unless is already set
 Mime::Type.register("text/csv", :xcsv) unless defined? Mime::XCSV
 
@@ -21,7 +19,7 @@ module ActiveList
         record = "r"
         code  = generator.select_data_code(paginate: false)
         encoding = "CP1252"
-        code << "data = ActiveList::CSV.generate(:col_sep => ';') do |csv|\n"
+        code << "data = ::CSV.generate(col_sep: ';') do |csv|\n"
         code << "  csv << [#{columns_to_array(:header, encoding: encoding).join(', ')}]\n"
         code << "  for #{record} in #{generator.records_variable_name}\n"
         code << "    csv << [#{columns_to_array(:body, record: record, encoding: encoding).join(', ')}]\n"

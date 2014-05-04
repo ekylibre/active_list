@@ -6,8 +6,6 @@ require 'code_string'
 
 module ActiveList
 
-  CSV = ::CSV
-
   # Build and returns a short UID
   def self.new_uid
     @@last_uid ||= 0

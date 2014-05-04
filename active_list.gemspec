@@ -17,12 +17,11 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
+  spec.required_ruby_version = '>= 1.9.3'
 
   spec.add_dependency "rails", [">= 3.2", "< 4.1"]
-  # spec.add_dependency "compass-rails", ["~> 1.1.7"]
   spec.add_dependency "code_string", [">= 0.0.0"]
   spec.add_dependency "rubyzip", [">= 1.0"]
-  spec.add_dependency "fastercsv", [">= 1.5"]
   spec.add_dependency "i18n-complements", [">= 0"]
   spec.add_development_dependency("sqlite3", [">= 0"])
 end
