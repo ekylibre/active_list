@@ -7,7 +7,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'active_list'
 dummy_path = Pathname.new(__FILE__).dirname.join("dummy")
 
-`cd #{dummy_path} && bundle exec rake db:migrate RAILS_ENV=test`
+Kernel.system("cd #{dummy_path} && bundle install && bundle exec rake db:drop db:create db:migrate db:seed RAILS_ENV=test")
 
 # CURRENT FILE :: test/test_helper.rb
 # Configure Rails Environment

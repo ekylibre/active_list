@@ -8,6 +8,13 @@ class PeopleControllerTest < ActionController::TestCase
 
     get :list, :format => :csv
     assert_response :success
+
+    get :list, :format => :ods
+    assert_response :success
+
+    # get :list, :format => :xcsv
+    # assert_response :success
+
   end
   
 end

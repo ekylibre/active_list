@@ -3,6 +3,7 @@ require 'action_dispatch'
 require 'rails'
 # require 'compass-rails'
 require 'code_string'
+require 'i18n-complements'
 
 module ActiveList
 
