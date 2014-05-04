@@ -75,25 +75,27 @@ module ActiveList
         code << "end\n"
 
         code << "#{var_name(:tbody)} << '</tbody>'\n"
-        code << "return #{var_name(:tbody)}.html_safe if options[:only] == 'body' or options[:only] == 'tbody'\n"
-
-        code << "html = ''\n"
-        code << "html << '<div id=\"#{table.name}\" data-list-source=\"'+h(url_for(options.merge(:action => '#{generator.controller_method_name}')))+'\" class=\"active-list\""
+        code << "return #{var_name(:tbody)}.html_safe if options[:only] == 'table-body'\n"
+        
+        # Build content
+        code << "#{var_name(:content)} = ''\n"
+        code << "#{var_name(:content)} << '<table class=\"list\""
         if table.paginate?
           code << " data-list-current-page=\"' + #{var_name(:page)}.to_s + '\" data-list-page-size=\"' + #{var_name(:limit)}.to_s + '\""
         end
         code << " data-list-sort-by=\"' + #{var_name(:params)}[:sort].to_s + '\" data-list-sort-dir=\"' + #{var_name(:params)}[:dir].to_s + '\""
         code << ">'\n"
-        code << "html << '<table class=\"list\">'\n"
-        code << "html << (#{header})\n"
+        code << "#{var_name(:content)} << (#{header})\n"
         code << "if block_given?\n"
-        code << "  html << '<tfoot>' + capture(" + table.columns.collect{|c| {name: c.name, id: c.id}}.inspect + ", &block).to_s + '</tfoot>'\n"
+        code << "  #{var_name(:content)} << '<tfoot>' + capture(" + table.columns.collect{|c| {name: c.name, id: c.id}}.inspect + ", &block).to_s + '</tfoot>'\n"
         code << "end\n"
-        code << "html << #{var_name(:tbody)}\n"
-        code << "html << '</table>'\n"
-        code << "html << #{extras}\n" if extras
-        code << "html << '</div>'\n"
-        code << "return html.html_safe\n"
+        code << "#{var_name(:content)} << #{var_name(:tbody)}\n"
+        code << "#{var_name(:content)} << '</table>'\n"
+        code << "#{var_name(:content)} << #{extras}\n" if extras
+        code << "return #{var_name(:content)}.html_safe if options[:only] == 'content'\n"
+
+        # Build whole
+        code << "return ('<div id=\"#{table.name}\" data-list-source=\"'+h(url_for(options.merge(:action => '#{generator.controller_method_name}')))+'\" class=\"active-list\">' + #{var_name(:content)} + '</div>').html_safe\n"
         return code
       end
 
@@ -104,10 +106,16 @@ module ActiveList
         unless [:body, :children].include?(nature)
           raise ArgumentError, "Nature is invalid"
         end
+        record = options[:record] || 'record_of_the_death'
+        if table.selectable?
+          code << "content_tag(:td, class: 'list-selector') do\n"
+          code << "  tag(:input, type: 'checkbox', value: #{record}.id, data: {list_selector: #{record}.id})\n"
+          code << "end +\n"
+        end
+
         children_mode = !!(nature == :children)
         for column in table.columns
           value_code = ""
-          record = options[:record] || 'record_of_the_death'
           if column.is_a? ActiveList::Definition::EmptyColumn
             value_code = 'nil'
           elsif column.is_a? ActiveList::Definition::StatusColumn
@@ -246,6 +254,9 @@ module ActiveList
       # and pagination management
       def header_code
         code = "'<thead><tr>"
+        if table.selectable?
+          code << "<th class=\"list-selector\"></th>"
+        end
         for column in table.columns
           code << "<th data-list-column=\"#{column.sort_id}\""
           code << " data-list-column-cells=\"#{column.short_id}\""

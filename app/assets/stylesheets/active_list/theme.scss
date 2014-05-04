@@ -3,7 +3,6 @@
 @import "compass/typography/text/replacement";
 
 
-
 // Because Compass sprites do not seems to work well in gems
 @mixin active-list-sprite($name, $size: 16px) {
   background-image: image-url("active-list.png");
