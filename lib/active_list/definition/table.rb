@@ -45,6 +45,18 @@ module ActiveList
         @paginate
       end
 
+      def has_many_records_action?
+        many_records_action_columns.any?
+      end
+
+      def many_records_action_columns
+        action_columns.select(&:use_many?)
+      end
+
+      def global_action_columns
+        action_columns.select(&:global?)
+      end
+
       def selectable?
         @selector
       end
@@ -57,6 +69,10 @@ module ActiveList
 
       def data_columns
         @columns.select{|c| c.is_a? DataColumn}
+      end
+
+      def action_columns
+        @columns.select{|c| c.is_a? ActionColumn}
       end
 
       def hidden_columns

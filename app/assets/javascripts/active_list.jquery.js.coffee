@@ -27,13 +27,56 @@ ActiveList = {}
             list.find("input[data-list-selector='#{id}']")
               .attr('checked', 'checked')
               .closest('tr').addClass('selected')
+          AL.checkGlobalButtons list
         true
 
     false
 
+
+  # Select a row of "many" buttons
+  AL.select = (element) ->
+    list = element.closest('div[data-list-source]')
+    row = element.closest('tr')
+    if list.prop('selection')?
+      selection = list.prop('selection')
+    else
+      selection = []
+    key = element.data('list-selector')
+    index = selection.indexOf(key)
+    if element.is ":checked"
+      if index < 0 
+        selection.push(key)
+      row.addClass("selected")
+    else
+      if index >= 0 
+        selection.splice(index, 1)
+      row.removeClass("selected")
+    list.prop('selection', selection)
+    AL.checkGlobalButtons list
+
+
+  # Hide/show needed global buttons
+  AL.checkGlobalButtons = (element) -> 
+    list = element.closest('div[data-list-source]')
+    selection = list.prop('selection')
+    if selection.length > 0
+      list.find('*[data-list-actioner="none"]:visible').hide()
+      list.find('*[data-list-actioner="many"]:hidden').show()
+    else
+      list.find('*[data-list-actioner="none"]:hidden').show()
+      list.find('*[data-list-actioner="many"]:visible').hide()
+    list.find('a[data-list-actioner="many"]').each (index) ->
+      button = $(this)
+      unless button.prop('hrefPattern')?
+        button.prop('hrefPattern', button.attr('href'))
+      pattern = button.prop('hrefPattern')
+      url = pattern.replace(encodeURIComponent("##IDS##"), selection.join(','), 'g')
+      button.attr("href", url)
+
+
+  # Move to given page
   AL.moveToPage = (element, page) ->
     page_attr = undefined
-    # element = $(element);
     page = element.data("list-move-to-page") if !page? or page is ""
     alert "Cannot define which page to load: " + page if !page? or page is ""
     if isNaN(page)
@@ -42,7 +85,6 @@ ActiveList = {}
       alert "Cannot define which page to load with attribute " + page_attr + ": " + page  if isNaN(page)
     AL.refresh element,
       page: page
-
     false
 
   
@@ -52,7 +94,6 @@ ActiveList = {}
     AL.refresh sorter,
       sort: sorter.data("list-column")
       dir:  sorter.data("list-column-sort")
-
     false
 
   
@@ -65,7 +106,6 @@ ActiveList = {}
     else
       AL.refresh sizer,
         per_page: per_page
-
     false
 
   
@@ -99,35 +139,35 @@ ActiveList = {}
       data:
         visibility: visibility
         column: columnId
-
     false
+
 
   # Select row
   $(document).on "click", "div[data-list-source] input[data-list-selector]", (event) ->
-    element = $(this)
-    list = element.closest('div[data-list-source]')
-    row = element.closest('tr')
-    if list.prop('selection')?
-      selection = list.prop('selection')
-    else
-      selection = []
-    key = element.data('list-selector')
-    index = selection.indexOf(key)
-    if element.is ":checked"
-      if index < 0 
-        selection.push(key)
-      row.addClass("selected")
-    else
-      if index >= 0 
-        selection.splice(index, 1)
-      row.removeClass("selected")
-    list.prop('selection', selection)
+    AL.select $(this)
     true
+
   
   # Change page of table on link clicks
   $(document).on "click", "div[data-list-source] a[data-list-move-to-page]", (event) ->
     AL.moveToPage $(this)
     false
+
+  
+  # Change page of table on link clicks
+  $(document).on "mouseovessr", "div[data-list-source] a[data-list-actioner='many']", (event) ->
+    element = $(this)
+    list = element.closest("div[data-list-source]")
+    selection = list.prop('selection')
+    if selection?
+      unless element.prop('hrefPattern')?
+        element.prop('hrefPattern', element.attr('href'))
+      pattern = element.prop('hrefPattern')
+      url = pattern.replace(encodeURIComponent("##IDS##"), selection.join(','), 'g')
+      console.log url
+      element.attr("href", url)
+      console.log url
+    true
 
   
   # Change page of table on input changes
@@ -142,6 +182,7 @@ ActiveList = {}
     title = element.attr("title")
     element.attr "title", element.html() unless title?
     return
+
 
   return
 ) jQuery, ActiveList

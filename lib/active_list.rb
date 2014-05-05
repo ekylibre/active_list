@@ -21,7 +21,6 @@ module ActiveList
   autoload :Renderers,  'active_list/renderers'
   autoload :Exporters,  'active_list/exporters'
   autoload :Generator,  'active_list/generator'
-  autoload :ActionPack, 'active_list/action_pack'
 
   mattr_reader :renderers
   @@renderers = {}
@@ -57,4 +56,4 @@ unless "string".respond_to? :dig
 end
 
 
-require 'active_list/rails/engine'
+require 'active_list/rails'

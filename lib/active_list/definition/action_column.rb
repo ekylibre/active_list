@@ -6,25 +6,68 @@ module ActiveList
     class ActionColumn < AbstractColumn
       include ActiveList::Helpers
 
+      USE_MODES = [:none, :single, :many, :both]
+
+      def initialize(table, name, options = {})
+        super(table, name, options)
+        @use_mode = (@options.delete(:on) || :single).to_sym
+        unless USE_MODES.include?(@use_mode)
+          raise "Invalid use mode: #{@use_mode.inspect}"
+        end
+        if @name.to_s == "destroy" and !@options.has_key?(:method)
+          @options[:method] = :delete 
+        end
+        if @name.to_s == "destroy" and !@options.has_key?(:confirm)
+          @options[:confirm] ||= :are_you_sure_you_want_to_delete 
+        end
+        @options[:if] ||= :destroyable? if @name.to_s == "destroy"
+        @options[:if] ||= :editable?    if @name.to_s == "edit"
+        @options[:confirm] = :are_you_sure if @options[:confirm].is_a?(TrueClass)
+      end
+
+      def use_single?
+        @use_mode == :single or @use_mode == :both
+      end
+
+      def use_many?
+        @use_mode == :many or @use_mode == :both
+      end
+
+      def use_none?
+        @use_mode == :none
+      end
+
+      def global?
+        self.use_none? or self.use_many?
+      end
+
       def header_code
         "''".c
       end
 
+      def default_url(use_mode = :many)
+        url = @options[:url] ||= {}
+        url[:controller] ||= (@options[:controller] || table.model.name.tableize)
+        url[:action] ||= @name.to_s
+        if @options.has_key? :format
+          url[:format] = @options[:format]
+        end
+        if use_many? and use_mode == :many
+          url[:id] ||= "##IDS##"
+        end
+        return url
+      end
+
       def operation(record = 'record_of_the_death')
-        @options[:method] = :delete if @name.to_s == "destroy" and !@options.has_key?(:method)
-        @options[:confirm] ||= :are_you_sure_you_want_to_delete if @name.to_s == "destroy" and !@options.has_key?(:confirm)
-        @options[:if] ||= :destroyable? if @name.to_s == "destroy"
-        @options[:if] ||= :editable? if @name.to_s == "edit"
-        @options[:confirm] = :are_you_sure if @options[:confirm].is_a?(TrueClass)
         link_options = ""
         if @options[:confirm]
           link_options << ", 'data-confirm' => #{(@options[:confirm]).inspect}.t(scope: 'labels')"
         end
-        if @options['data-method'] or @options[:method]
-          link_options << ", :method => h('#{(@options['data-method']||@options[:method])}')"
+        if @options[:method]
+          link_options << ", method: :#{@options[:method].to_s.underscore}"
         end
         action = @name
-        format = @options[:format] ? ", :format => '#{@options[:format]}'" : ""
+        format = @options[:format] ? ", format: '#{@options[:format]}'" : ""
         if @options[:remote]
           raise StandardError, "Sure to use :remote ?"
           # remote_options = @options.dup
@@ -39,6 +82,9 @@ module ActiveList
           # code += ", {title: #{action.inspect}.tl}"
           # code += ")"
         elsif @options[:actions]
+          unless use_single?
+            raise StandardError, "Only compatible with single actions"
+          end
           unless @options[:actions].is_a? Hash
             raise StandardError, "options[:actions] have to be a Hash."
           end
@@ -58,8 +104,8 @@ module ActiveList
           url[:id] ||= "RECORD.id".c
           url.delete_if{|k, v| v.nil?}
           url = "{" + url.collect{|k, v| "#{k}: " + urlify(v, record)}.join(", ")+format+"}"
-          code = "{class: '#{@name}'"+link_options+"}"
-          code = "link_to(content_tag(:i) + h('#{action}'.t(scope: 'labels')), "+url+", "+code+")"
+          code = "{class: '#{@name}'" + link_options+"}"
+          code = "link_to(content_tag(:i) + h(' ' + '#{action}'.t(scope: 'labels')), " + url + ", " + code + ")"
         end
         if @options[:if]
           code = "if " + recordify!(@options[:if], record) + "\n" + code.dig + "end"

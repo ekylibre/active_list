@@ -19,6 +19,7 @@ eng: &eng
       next: "Next page"
       previous: "Previous page"
       showing_x_to_y_of_total: "Showing %{x} to %{y} of %{total}"
+      x_to_y_of_total: "%{x}-%{y} of %{total}"
     x_per_page:
       one: "%{count} per page"
       other: "%{count} per page"

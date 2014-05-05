@@ -79,6 +79,7 @@ module ActiveList
         
         # Build content
         code << "#{var_name(:content)} = ''\n"
+        code << "#{var_name(:content)} << #{extras}\n" unless extras.blank?
         code << "#{var_name(:content)} << '<table class=\"list\""
         if table.paginate?
           code << " data-list-current-page=\"' + #{var_name(:page)}.to_s + '\" data-list-page-size=\"' + #{var_name(:limit)}.to_s + '\""
@@ -91,7 +92,6 @@ module ActiveList
         code << "end\n"
         code << "#{var_name(:content)} << #{var_name(:tbody)}\n"
         code << "#{var_name(:content)} << '</table>'\n"
-        code << "#{var_name(:content)} << #{extras}\n" if extras
         code << "return #{var_name(:content)}.html_safe if options[:only] == 'content'\n"
 
         # Build whole
@@ -195,6 +195,7 @@ module ActiveList
             form_name = column.form_name || "'#{table.name}[' + #{record}.id.to_s + '][#{column.name}]'".c
             value_code = (nature == :body ? "text_field_tag(#{form_name.inspect}, #{recordify!(column.options[:value] || column.name, record)}#{column.options[:size] ? ', size: ' + column.options[:size].to_s : ''})" : "nil") # , id: '#{table.name}_'+#{record}.id.to_s + '_#{column.name}'
           elsif column.is_a?(ActiveList::Definition::ActionColumn)
+            next unless column.use_single?
             value_code = (nature == :body ? column.operation(record) : "nil")
           else
             value_code = "'&#160;&#8709;&#160;'.html_safe"
@@ -209,15 +210,16 @@ module ActiveList
         #   code << "content_tag(:td)"
         # end
 
-        code << "content_tag(:td)"
+        code << "''.html_safe"
+        # code << "content_tag(:td)"
         return code.c
       end
 
 
       # Produces main menu code
       def menu_code
-        menu = "<div class=\"list-menu\">"
-        menu << "<a class=\"list-menu-start\"><span class=\"icon\"></span><span class=\"text\">' + h(::I18n.translate('list.menu').gsub(/\'/,'&#39;')) + '</span></a>"
+        menu = "<span class=\"settings\">"
+        menu << "<a class=\"settings-start\"><i></i>' + h('list.menu'.t) + '</a>"
         menu << "<ul>"
         if table.paginate?
           # Per page
@@ -225,18 +227,18 @@ module ActiveList
           list << table.options[:per_page].to_i if table.options[:per_page].to_i > 0
           list = list.uniq.sort
           menu << "<li class=\"parent\">"
-          menu << "<a class=\"pages\"><span class=\"icon\"></span><span class=\"text\">' + ::I18n.translate('list.items_per_page').gsub(/\'/,'&#39;') + '</span></a><ul>"
+          menu << "<a class=\"pages\"><i></i>' + h('list.items_per_page'.t) + '</a><ul>"
           for n in list
-            menu << "<li data-list-change-page-size=\"#{n}\" '+(#{var_name(:params)}[:per_page] == #{n} ? ' class=\"check\"' : '')+'><a><span class=\"icon\"></span><span class=\"text\">'+h(::I18n.translate('list.x_per_page', :count => #{n}))+'</span></a></li>"
+            menu << "<li data-list-change-page-size=\"#{n}\" '+(#{var_name(:params)}[:per_page] == #{n} ? ' class=\"check\"' : '') + '><a><i></i>' + h('list.x_per_page'.t(count: #{n})) + '</a></li>"
           end
           menu << "</ul></li>"
         end
 
         # Column selector
         menu << "<li class=\"parent\">"
-        menu << "<a class=\"columns\"><span class=\"icon\"></span><span class=\"text\">' + ::I18n.translate('list.columns').gsub(/\'/,'&#39;') + '</span></a><ul>"
+        menu << "<a class=\"columns\"><i></i>' + h('list.columns'.t) + '</a><ul>"
         for column in table.data_columns
-          menu << "<li data-list-toggle-column=\"#{column.name}\" class=\"'+(#{var_name(:params)}[:hidden_columns].include?(:#{column.name}) ? 'unchecked' : 'checked')+'\"><a><span class=\"icon\"></span><span class=\"text\">'+h(#{column.header_code})+'</span></a></li>"
+          menu << "<li data-list-toggle-column=\"#{column.name}\" class=\"' + (#{var_name(:params)}[:hidden_columns].include?(:#{column.name}) ? 'unchecked' : 'checked') + '\"><a><i></i>' + h(#{column.header_code}) + '</a></li>"
         end
         menu << "</ul></li>"
 
@@ -244,9 +246,9 @@ module ActiveList
         menu << "<li class=\"separator\"></li>"
         # Exports
         for format, exporter in ActiveList.exporters
-          menu << "<li class=\"export #{exporter.name}\">' + link_to(params.merge(:action => :#{generator.controller_method_name}, :sort => #{var_name(:params)}[:sort], :dir => #{var_name(:params)}[:dir], :format => '#{format}')) { '<span class=\"icon\"></span>'.html_safe + content_tag('span', ::I18n.translate('list.export_as', :exported => ::I18n.translate('list.export.formats.#{format}')).gsub(/\'/,'&#39;'), :class => 'text')} + '</li>"
+          menu << "<li class=\"export export-#{format}\">' + link_to(content_tag(:i) + h('list.export_as'.t(exported: :#{format}.t(scope: 'list.export.formats'))), params.merge(action: :#{generator.controller_method_name}, sort: #{var_name(:params)}[:sort], dir: #{var_name(:params)}[:dir], format: '#{format}')) + '</li>"
         end
-        menu << "</ul></div>"
+        menu << "</ul></span>"
         return menu
       end
 
@@ -258,45 +260,67 @@ module ActiveList
           code << "<th class=\"list-selector\"></th>"
         end
         for column in table.columns
+          next if column.is_a?(ActiveList::Definition::ActionColumn) and !column.use_single?
           code << "<th data-list-column=\"#{column.sort_id}\""
           code << " data-list-column-cells=\"#{column.short_id}\""
           code << " data-list-column-sort=\"'+(#{var_name(:params)}[:sort] != '#{column.sort_id}' ? 'asc' : #{var_name(:params)}[:dir] == 'asc' ? 'desc' : 'asc')+'\"" if column.sortable?
           code << " class=\"#{column_classes(column, true, true)}\""
           code << ">"
-          code << "<span class=\"text\">'+h(#{column.header_code})+'</span>"
-          code << "<span class=\"icon\"></span>"
+          code << "' + h(#{column.header_code}) + '"
+          code << "<i></i>"
           code << "</th>"
         end
-        code << "<th class=\"spe\">#{menu_code}</th>"
+        # code << "<th class=\"spe\">#{menu_code}</th>"
         code << "</tr></thead>'"
         return code
       end
 
       # Produces the code to create bottom menu and pagination
       def extras_code
-        code, pagination = nil, ''
+        code = []
+
+        if table.global_action_columns.any?
+          actioner = ""
+          actioner << "<span class=\"actioner\">'"
+          for column in table.global_action_columns
+            actioner << " + link_to(content_tag(:i) + h(' ' + :#{column.name.to_s}.t(scope: 'labels')), #{column.default_url.inspect}, class: 'btn btn-#{column.name}'#{', style: "display: none"' unless column.use_none?}#{', method: "' + column.options[:method].to_s + '"' if column.options[:method]}, data: {list_actioner: :#{column.use_none? ? 'none' : 'many'}#{', confirm: :' + column.options[:confirm].to_s + '.t(scope: "labels")' if column.options[:confirm]}})"
+          end
+          actioner << " + '</span>"
+          code << "'#{actioner}'"
+        end
+
+        code << "'#{menu_code}'"
 
         if table.paginate?
+          pagination = ""
           current_page = "#{var_name(:page)}"
           last_page = "#{var_name(:last)}"
 
-          pagination << "<div class=\"pagination\">"
-          pagination << "<a href=\"#\" data-list-move-to-page=\"1\" class=\"first-page\"' + (#{current_page} != 1 ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.first') + '</a>"
-          pagination << "<a href=\"#\" data-list-move-to-page=\"' + (#{current_page} - 1).to_s + '\" class=\"previous-page\"' + (#{current_page} != 1 ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.previous') + '</a>"
+          pagination << "<span class=\"pagination\">"
+          pagination << "<span class=\"status\">' + 'list.pagination.x_to_y_of_total'.t(x: (#{var_name(:offset)} + 1), y: ((#{var_name(:last)} == #{var_name(:page)}) ? #{var_name(:count)} : #{var_name(:offset)} + #{var_name(:limit)}), total: #{var_name(:count)}) + '</span>"
+
+          pagination << "<span class=\"paginator\">"
+
+          pagination << "<a href=\"#\" data-list-move-to-page=\"1\" class=\"btn first-page\"' + (#{current_page} != 1 ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.first') + '</a>"
+          pagination << "<a href=\"#\" data-list-move-to-page=\"' + (#{current_page} - 1).to_s + '\" class=\"btn previous-page\"' + (#{current_page} != 1 ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.previous') + '</a>"
 
           x = '@@PAGE-NUMBER@@'
           y = '@@PAGE-COUNT@@'
-          pagination << "<span class=\"paginator\">'+::I18n.translate('list.page_x_on_y', :default => '%{x} / %{y}', :x => '#{x}', :y => '#{y}').html_safe.gsub('#{x}', ('<input type=\"number\" size=\"4\" data-list-move-to-page=\"value\" value=\"'+#{var_name(:page)}.to_s+'\">').html_safe).gsub('#{y}', #{var_name(:last)}.to_s) + '</span>"
+          # pagination << "<span class=\"paginator\">'+::I18n.translate('list.page_x_on_y', :default => '%{x} / %{y}', :x => '#{x}', :y => '#{y}').html_safe.gsub('#{x}', ('<input type=\"number\" size=\"4\" data-list-move-to-page=\"value\" value=\"'+#{var_name(:page)}.to_s+'\">').html_safe).gsub('#{y}', #{var_name(:last)}.to_s) + '</span>"
+          # pagination << "<input type=\"number\" size=\"4\" data-list-move-to-page=\"value\" value=\"' + #{var_name(:page)}.to_s + '\">"
 
-          pagination << "<a href=\"#\" data-list-move-to-page=\"' + (#{current_page} + 1).to_s + '\" class=\"next-page\"' + (#{current_page} != #{last_page} ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.next')+'</a>"
-          pagination << "<a href=\"#\" data-list-move-to-page=\"' + (#{last_page}).to_s + '\" class=\"last-page\"' + (#{current_page} != #{last_page} ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.last')+'</a>"
+          pagination << "<a href=\"#\" data-list-move-to-page=\"' + (#{current_page} + 1).to_s + '\" class=\"btn next-page\"' + (#{current_page} != #{last_page} ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.next')+'</a>"
+          pagination << "<a href=\"#\" data-list-move-to-page=\"' + (#{last_page}).to_s + '\" class=\"btn last-page\"' + (#{current_page} != #{last_page} ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.last')+'</a>"
+          pagination << "</span>"
 
-          pagination << "<span class=\"separator\"></span>"
+          # pagination << "<span class=\"separator\"></span>"
 
-          pagination << "<span class=\"status\">'+::I18n.translate('list.pagination.showing_x_to_y_of_total', :x => (#{var_name(:offset)} + 1), :y => ((#{var_name(:last)} == #{var_name(:page)}) ? #{var_name(:count)} : #{var_name(:offset)}+#{var_name(:limit)}), :total => #{var_name(:count)})+'</span>"
-          pagination << "</div>"
 
-          code = "(#{var_name(:last)} > 1 ? '<div class=\"extras\">#{pagination}</div>' : '').html_safe"
+          code << "'#{pagination}'"
+        end
+
+        unless code.empty?
+          code = "content_tag(:div, (#{code.join(' + ')}).html_safe, class: 'list-control')"
         end
 
         return code
