@@ -283,7 +283,7 @@ module ActiveList
           actioner = ""
           actioner << "<span class=\"actioner\">'"
           for column in table.global_action_columns
-            actioner << " + link_to(content_tag(:i) + h(' ' + :#{column.name.to_s}.t(scope: 'labels')), #{column.default_url.inspect}, class: 'btn btn-#{column.name}'#{', style: "display: none"' unless column.use_none?}#{', method: "' + column.options[:method].to_s + '"' if column.options[:method]}, data: {list_actioner: :#{column.use_none? ? 'none' : 'many'}#{', confirm: :' + column.options[:confirm].to_s + '.t(scope: "labels")' if column.options[:confirm]}})"
+            actioner << " + link_to(content_tag(:i) + h(' ' + :#{column.name.to_s}.t(scope: 'rest.actions')), #{column.default_url.inspect}, class: 'btn btn-#{column.name}'#{', style: "display: none"' unless column.use_none?}#{', method: "' + column.options[:method].to_s + '"' if column.options[:method]}, data: {list_actioner: :#{column.use_none? ? 'none' : 'many'}#{', confirm: :' + column.options[:confirm].to_s + '.t(scope: "labels")' if column.options[:confirm]}})"
           end
           actioner << " + '</span>"
           code << "'#{actioner}'"
@@ -297,7 +297,7 @@ module ActiveList
           last_page = "#{var_name(:last)}"
 
           pagination << "<span class=\"pagination\">"
-          pagination << "<span class=\"status\">' + 'list.pagination.x_to_y_of_total'.t(x: (#{var_name(:offset)} + 1), y: ((#{var_name(:last)} == #{var_name(:page)}) ? #{var_name(:count)} : #{var_name(:offset)} + #{var_name(:limit)}), total: #{var_name(:count)}) + '</span>"
+          pagination << "<span class=\"status\">' + 'list.pagination.x_to_y_of_total'.t(x: (#{var_name(:offset)} + (#{var_name(:count)} > 0 ? 1 : 0)), y: ((#{var_name(:last)} == #{var_name(:page)}) ? #{var_name(:count)} : #{var_name(:offset)} + #{var_name(:limit)}), total: #{var_name(:count)}) + '</span>"
 
           pagination << "<span class=\"paginator\">"
 

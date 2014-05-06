@@ -13,7 +13,6 @@ module ActiveList
         @options[:renderer] ||= :simple_renderer
         @options[:per_page] = 20 if @options[:per_page].to_i <= 0
         @options[:page] = 1 if @options[:page].to_i <= 0
-        @selector = @options.delete(:selector)
         @columns = []
         @id = ActiveList.new_uid
       end
@@ -58,7 +57,7 @@ module ActiveList
       end
 
       def selectable?
-        @selector
+        action_columns.select(&:use_many?)        
       end
 
       # Retrieves all columns in database
