@@ -10,6 +10,8 @@ module ActiveList
 
       USE_MODES = [:none, :single, :many, :both]
 
+      attr_reader :use_mode
+
       def initialize(table, name, options = {})
         super(table, name, options)
         @use_mode = (@options.delete(:on) || :single).to_sym

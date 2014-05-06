@@ -57,7 +57,7 @@ module ActiveList
       end
 
       def selectable?
-        action_columns.select(&:use_many?)        
+        action_columns.select(&:use_many?).any?
       end
 
       # Retrieves all columns in database
