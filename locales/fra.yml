@@ -19,6 +19,7 @@ fra: &fra
       next: "Suivant"
       previous: "Précédent"
       showing_x_to_y_of_total: "Enregistrements %{x} à %{y} sur %{total}"
+      x_to_y_of_total: "%{x}-%{y} sur %{total}"
     x_per_page:
       one: "%{count} par page"
       other: "%{count} par page"
