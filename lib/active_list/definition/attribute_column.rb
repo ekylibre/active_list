@@ -10,9 +10,9 @@ module ActiveList
         super(table, name, options)
         @label_method = (options[:label_method] || @name).to_sym
         unless @sort_column = options[:sort]
-          if @table.model.columns_hash[@label_method]
+          if @table.model.columns_hash[@label_method.to_s]
             @sort_column = @label_method
-          elsif @table.model.columns_hash[@name]
+          elsif @table.model.columns_hash[@name.to_s]
             @sort_column = @name
           else
             @sort_column = :id
