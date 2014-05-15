@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = "burisu@oneiros.fr"
   spec.summary       = "Simple interactive tables for Rails app"
   spec.description   = "Generates action methods to provide clean tables."
-  spec.homepage      = "http://github.com/burisu/active_list"
+  spec.homepage      = "http://github.com/ekylibre/active_list"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z app lib locales LICENSE.txt README.rdoc test`.split("\x0")
