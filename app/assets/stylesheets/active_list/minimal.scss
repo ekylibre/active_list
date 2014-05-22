@@ -8,15 +8,12 @@ div[data-list-source] {
                &[data-list-column-sort] {
 		  cursor: pointer;
                }
-
                &.hidden {
 		  display: none;
                }
-
             }
 	 }
       }
-
       tbody {
 	 tr {
             td.hidden {
@@ -40,18 +37,16 @@ div[data-list-source] {
       a { cursor: pointer; }
       .settings-start {
 	 height: 16px;
-	 padding: 2px;
       }
       &:hover {
-	 .list-menu-start { z-index:5000;  position: relative; top: 0px; }
+	 .settings-start { z-index: 5000;  position: relative; top: 0px; }
 	 & > ul { display: block; }
       }
       ul {
 	 display: none;
-	 position:absolute;
+	 position: absolute;
 	 top: 20px;
-	 padding: 1px;
-	 margin:0;
+	 margin: 0;
 	 & { right: 0px;}
 	 html[dir="rtl"] & { left: 0px;}
 	 li {
@@ -66,8 +61,6 @@ div[data-list-source] {
                display: block;
             }
             ul {
-               display: none;
-               position: absolute;
                top: -2px;
                & { right: 25ex; }
                html[dir="rtl"] & { left: 25ex; }
