@@ -102,7 +102,7 @@ ActiveList = {}
     sizer = $(this)
     per_page = sizer.data("list-change-page-size")
     if isNaN(per_page)
-      alert "@list-change-page-size attribute is not a number: " + per_page
+      alert "@list-change-page-size attribute is not a number: #{per_page}"
     else
       AL.refresh sizer,
         per_page: per_page
@@ -115,12 +115,12 @@ ActiveList = {}
     visibility = ""
     columnId = element.data("list-toggle-column")
     list = element.closest("div[data-list-source]")
-    column = list.find("th[data-list-column=\"" + columnId + "\"]")
+    column = list.find("th[data-list-column=\"#{columnId}\"]")
     
     #$('#'+columnId);
     className = column.data("list-column-cells")
-    className = columnId  if className is null
-    search = "." + className
+    className = columnId unless className?
+    search = ".#{className}"
     if column.hasClass("hidden")
       $(search).removeClass "hidden"
       column.removeClass "hidden"
@@ -133,8 +133,7 @@ ActiveList = {}
       element.removeClass "checked"
       element.addClass "unchecked"
       visibility = "hidden"
-    url = list.data("list-source")
-    $.ajax url,
+    $.ajax list.data("list-source"),
       dataType: "html"
       data:
         visibility: visibility

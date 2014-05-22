@@ -80,7 +80,7 @@ module ActiveList
         # Build content
         code << "#{var_name(:content)} = ''\n"
         code << "#{var_name(:content)} << #{extras}\n" unless extras.blank?
-        code << "#{var_name(:content)} << '<table class=\"list\""
+        code << "#{var_name(:content)} << '<div class=\"list-data\"><table class=\"list\""
         if table.paginate?
           code << " data-list-current-page=\"' + #{var_name(:page)}.to_s + '\" data-list-page-size=\"' + #{var_name(:limit)}.to_s + '\""
         end
@@ -91,7 +91,7 @@ module ActiveList
         code << "  #{var_name(:content)} << '<tfoot>' + capture(" + table.columns.collect{|c| {name: c.name, id: c.id}}.inspect + ", &block).to_s + '</tfoot>'\n"
         code << "end\n"
         code << "#{var_name(:content)} << #{var_name(:tbody)}\n"
-        code << "#{var_name(:content)} << '</table>'\n"
+        code << "#{var_name(:content)} << '</table></div>'\n"
         code << "return #{var_name(:content)}.html_safe if options[:only] == 'content'\n"
 
         # Build whole
@@ -300,7 +300,7 @@ module ActiveList
           pagination << "<span class=\"status\">' + 'list.pagination.x_to_y_of_total'.t(x: (#{var_name(:offset)} + (#{var_name(:count)} > 0 ? 1 : 0)), y: ((#{var_name(:last)} == #{var_name(:page)}) ? #{var_name(:count)} : #{var_name(:offset)} + #{var_name(:limit)}), total: #{var_name(:count)}) + '</span>"
 
           pagination << "<span class=\"paginator\">"
-          pagination << "<a href=\"#\" data-list-move-to-page=\"1\" class=\"btn first-page\"' + (#{current_page} != 1 ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.first') + '</a>"
+          # pagination << "<a href=\"#\" data-list-move-to-page=\"1\" class=\"btn first-page\"' + (#{current_page} != 1 ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.first') + '</a>"
           pagination << "<a href=\"#\" data-list-move-to-page=\"' + (#{current_page} - 1).to_s + '\" class=\"btn previous-page\"' + (#{current_page} != 1 ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.previous') + '</a>"
 
           x = '@@PAGE-NUMBER@@'
@@ -309,7 +309,7 @@ module ActiveList
           # pagination << "<input type=\"number\" size=\"4\" data-list-move-to-page=\"value\" value=\"' + #{var_name(:page)}.to_s + '\">"
 
           pagination << "<a href=\"#\" data-list-move-to-page=\"' + (#{current_page} + 1).to_s + '\" class=\"btn next-page\"' + (#{current_page} != #{last_page} ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.next')+'</a>"
-          pagination << "<a href=\"#\" data-list-move-to-page=\"' + (#{last_page}).to_s + '\" class=\"btn last-page\"' + (#{current_page} != #{last_page} ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.last')+'</a>"
+          # pagination << "<a href=\"#\" data-list-move-to-page=\"' + (#{last_page}).to_s + '\" class=\"btn last-page\"' + (#{current_page} != #{last_page} ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.last')+'</a>"
           pagination << "</span>"
 
           pagination << "</span>"

@@ -1,5 +1,5 @@
 module ActiveList
 
-  VERSION = "6.1.5"
+  VERSION = "6.2.0"
 
 end
