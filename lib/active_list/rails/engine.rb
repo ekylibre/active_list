@@ -1,6 +1,5 @@
 module ActiveList
   module Rails
-
     class Engine < ::Rails::Engine
       engine_name "active_list"
       initializer "active_list.integrate_methods" do |app|
@@ -10,6 +9,5 @@ module ActiveList
         ::I18n.load_path.concat(files)
       end
     end
-
   end
 end
