@@ -123,7 +123,7 @@ module ActiveList
         if @model.reflect_on_association(name)
           options[:through] ||= name
           add :association, name, options
-        elsif @model.reflect_on_association(options[:through])
+        elsif options[:through] and @model.reflect_on_association(options[:through])
           options[:label_method] ||= name
           add :association, name, options
         else
