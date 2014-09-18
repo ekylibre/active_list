@@ -5,8 +5,9 @@ module ActiveList
       initializer "active_list.integrate_methods" do |app|
         ::ActionController::Base.send(:include, ActiveList::Rails::Integration::ActionController)
         ::ActionView::Base.send(:include, ActiveList::Rails::Integration::ViewsHelper)
-        files = Dir[File.join(File.dirname(__FILE__), "..", "..", "..", "config", "locales", "*.yml")]
-        ::I18n.load_path.concat(files)
+        # files = Dir[Pathname.new(__FILE__).dirname.join("..", "..", "..", "config", "locales", "*.yml")]
+        # puts ::I18n.load_path.map(&:red).to_sentence
+        # ::I18n.load_path.concat(files)
       end
     end
   end

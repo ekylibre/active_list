@@ -24,3 +24,4 @@ fra: &fra
       one: "%{count} par page"
       other: "%{count} par page"
 fr: *fra
+fr-FR: *fra
