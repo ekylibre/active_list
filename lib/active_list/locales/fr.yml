@@ -1,4 +1,4 @@
-fra: &fra
+fr: &fr
   list:
     columns: "Colonnes"
     export:
@@ -23,5 +23,4 @@ fra: &fra
     x_per_page:
       one: "%{count} par page"
       other: "%{count} par page"
-fr: *fra
-fr-FR: *fra
+fra: *fr

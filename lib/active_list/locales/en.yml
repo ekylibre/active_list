@@ -1,4 +1,4 @@
-eng: &eng
+en: &en
   list:
     columns: "Columns"
     export:
@@ -23,4 +23,5 @@ eng: &eng
     x_per_page:
       one: "%{count} per page"
       other: "%{count} per page"
-en: *eng
+eng: *en
+
