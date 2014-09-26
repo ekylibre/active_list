@@ -70,7 +70,7 @@ module ActiveList
         code << "  zile << ('</table:table></office:spreadsheet></office:body></office:document-content>')\n"
         code << "end\n"
         code << "send_file(file, stream: false, type: #{self.mime_type.to_s.inspect}, disposition: 'inline', filename: name+'.#{self.file_extension}')\n"
-        code << "File.delete(file)\n" # Removes tmp files before they explode the disk
+        # code << "File.delete(file)\n" # Removes tmp files before they explode the disk
         # raise code
         return code
       end
