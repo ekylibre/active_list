@@ -30,7 +30,7 @@ module ActiveList
         record = "r"
         code  = generator.select_data_code(paginate: false)
         code << "name = #{table.model.name}.model_name.human.gsub(/[^a-z0-9]/i, '_')\n"
-        code << "file = ::Rails.root.join('tmp', 'export', 'active_list', name + rand.to_s+'.#{self.file_extension}')\n"
+        code << "file = ActiveList.temporary_directory.join(name + rand(999_999_999).to_s(36) + '.#{self.file_extension}')\n"
         code << "FileUtils.mkdir_p(file.dirname)\n"
         code << "Zip::OutputStream.open(file) do |zile|\n"
         # MimeType in first place

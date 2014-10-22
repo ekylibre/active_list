@@ -21,6 +21,26 @@ module ActiveList
   autoload :Exporters,  'active_list/exporters'
   autoload :Generator,  'active_list/generator'
 
+  # Set the temporary directory
+  # Pathname or callable are acceptable
+  def self.temporary_directory=(dir)
+    if dir.respond_to?(:call) or dir.is_a?(Pathname)
+      @@temporary_directory = dir
+    else
+      @@temporary_directory = Pathname(dir)
+    end
+  end
+
+  # Returns the temporary directory
+  def self.temporary_directory
+    if @@temporary_directory.respond_to? :call
+      @@temporary_directory.call
+    else
+      @@temporary_directory
+    end
+  end
+
+
   mattr_reader :renderers
   @@renderers = {}
 
@@ -38,6 +58,8 @@ module ActiveList
   end
 
 end
+
+ActiveList.temporary_directory = Pathname(Dir.tmpdir)
 
 ActiveList.register_renderer(:simple_renderer, ActiveList::Renderers::SimpleRenderer)
 
