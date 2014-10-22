@@ -3,7 +3,6 @@
 {<img src="https://api.travis-ci.org/ekylibre/active_list.png?branch=master"/>}[https://travis-ci.org/ekylibre/active_list]
 {<img src="https://gemnasium.com/ekylibre/active_list.png"/>}[https://gemnasium.com/ekylibre/active_list]
 {<img src="https://codeclimate.com/github/ekylibre/active_list.png" />}[https://codeclimate.com/github/ekylibre/active_list]
-{<img src="https://coveralls.io/repos/ekylibre/active_list/badge.png?branch=master" alt="Coverage Status" />}[https://coveralls.io/r/ekylibre/active_list]
 
 ActiveList is a simple list widget. It permits to create a controller 
 method and view helper to displays lists.
