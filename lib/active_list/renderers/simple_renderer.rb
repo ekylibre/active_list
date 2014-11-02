@@ -7,18 +7,18 @@ module ActiveList
 
 
       DATATYPE_ABBREVIATION = {
-        :binary => :bin,
-        :boolean => :bln,
-        :date => :dat,
-        :datetime => :dtt,
-        :decimal => :dec,
-        :measure => :dec,
-        :float => :flt,
-        :integer => :int,
-        :string => :str,
-        :text => :txt,
-        :time => :tim,
-        :timestamp => :dtt
+        binary:    :bin,
+        boolean:   :bln,
+        date:      :dat,
+        datetime:  :dtt,
+        decimal:   :dec,
+        measure:   :dec,
+        float:     :flt,
+        integer:   :int,
+        string:    :str,
+        text:      :txt,
+        time:      :tim,
+        timestamp: :dtt
       }
 
       def remote_update_code
@@ -30,9 +30,9 @@ module ActiveList
         code << "  #{var_name(:params)}[:hidden_columns] << column if params[:visibility] == 'hidden'\n"
         code << "  head :ok\n"
         code << "elsif params[:only]\n"
-        code << "  render(:inline => '<%=#{generator.view_method_name}(:only => params[:only])-%>')\n"
+        code << "  render(inline: '<%=#{generator.view_method_name}(:only => params[:only])-%>')\n"
         code << "else\n"
-        code << "  render(:inline => '<%=#{generator.view_method_name}-%>')\n"
+        code << "  render(inline: '<%=#{generator.view_method_name}-%>')\n"
         code << "end\n"
         return code
       end

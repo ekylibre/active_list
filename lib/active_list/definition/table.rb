@@ -81,7 +81,7 @@ module ActiveList
       # Compute includes Hash
       def reflections
         hash = []
-        for column in self.columns
+        self.columns.each do |column|
           if column.respond_to?(:reflection)
             unless hash.detect{|r| r.name == column.reflection.name }
               hash << column.reflection

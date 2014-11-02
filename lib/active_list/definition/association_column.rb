@@ -67,8 +67,10 @@ module ActiveList
       end
 
       def sort_expression
-        if table.reflections.select{|r| r.table_name == @reflection.table_name}.size > 1
-          "#{@reflection.name.to_s.pluralize}_#{@reflection.class_name.constantize.table_name}.#{@sort_column}"
+        same_table_reflections = table.reflections.select{|r| r.table_name == @reflection.table_name}
+        if same_table_reflections.size > 1 and same_table_reflections.index{|r| r.name == @reflection.name } > 0
+          # "#{@reflection.name.to_s.pluralize}_#{@reflection.class_name.constantize.table_name}.#{@sort_column}"
+          "#{@reflection.name.to_s.pluralize}_#{table.model.table_name}.#{@sort_column}"
         else
           "#{@reflection.class_name.constantize.table_name}.#{@sort_column}"
         end

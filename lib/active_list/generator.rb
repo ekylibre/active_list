@@ -20,8 +20,8 @@ module ActiveList
       else
         @table.load_default_columns
       end
-      @parameters = {:sort => :to_s, :dir => :to_s}
-      @parameters.merge!(:page => :to_i, :per_page => :to_i) if @table.paginate?
+      @parameters = {sort: :to_s, dir: :to_s}
+      @parameters.merge!(page: :to_i, per_page: :to_i) if @table.paginate?
     end
 
     def collection?
