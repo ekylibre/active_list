@@ -13,6 +13,7 @@ ActiveList = {}
       page:     table.data("list-current-page")
       per_page: table.data("list-page-size")
       only:     "content"
+      redirect: list.data("list-redirect")
 
     $.extend parameters, options
     url = list.data("list-source")
@@ -84,16 +85,11 @@ ActiveList = {}
     if isNaN(page)
       page_attr = page
       page = element.attr(page_attr)
-      alert "Cannot define which page to load with attribute " + page_attr + ": " + page  if isNaN(page)
+      alert "Cannot define which page to load with attribute #{page_attr}: #{page}" if isNaN(page)
     AL.refresh element,
       page: page
     false
 
-  # Adds highlight effect
-  AL.highlightFocusedRows = () ->
-    console.log "Highlight"
-    $("*[data-list-source] tr.focus.focus-active").removeClass("focus-active")
-  
   # Sort by one column
   $(document).on "click", "div[data-list-source] th[data-list-column][data-list-column-sort]", (event) ->
     sorter = $(this)
@@ -187,9 +183,6 @@ ActiveList = {}
     title = element.attr("title")
     element.attr "title", element.html() unless title?
     return
-
-  $(document).on "cocoon:after-insert page:change", (event) ->
-    AL.highlightFocusedRows()
 
   return
 ) jQuery, ActiveList

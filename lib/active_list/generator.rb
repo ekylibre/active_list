@@ -105,6 +105,8 @@ module ActiveList
         expr = "(#{expr} || #{@table.options[parameter]})" unless @table.options[parameter].blank?
         code << "#{var_name(:params)}[:#{parameter}] = #{expr}.#{convertor}\n"
       end
+      code << "params[:redirect] ||= request.fullpath unless request.xhr?\n"
+
       # Order
       code << "#{var_name(:order)} = #{@table.options[:order] ? @table.options[:order].inspect : 'nil'}\n"
       code << "if #{var_name(:col)} = {" + @table.sortable_columns.collect{|c| "'#{c.sort_id}' => '#{c.sort_expression}'"}.join(', ') + "}[#{var_name(:params)}[:sort]]\n"

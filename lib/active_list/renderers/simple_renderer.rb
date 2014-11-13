@@ -57,9 +57,9 @@ module ActiveList
         code << "    #{var_name(:attrs)} = {id: 'r' + #{record}.id.to_s}\n"
         if table.options[:line_class]
           code << "    #{var_name(:attrs)}[:class] = (#{recordify!(table.options[:line_class], record)}).to_s\n"
-          code << "    #{var_name(:attrs)}[:class] << ' focus focus-active' if params['#{table.name}-id'].to_i == #{record}.id\n"
+          code << "    #{var_name(:attrs)}[:class] << ' focus' if params['#{table.name}-id'].to_i == #{record}.id\n"
         else
-          code << "    #{var_name(:attrs)}[:class] = 'focus focus-active' if params['#{table.name}-id'].to_i == #{record}.id\n"
+          code << "    #{var_name(:attrs)}[:class] = 'focus' if params['#{table.name}-id'].to_i == #{record}.id\n"
         end
         code << "    #{var_name(:tbody)} << content_tag(:tr, #{var_name(:attrs)}) do\n"
         code << columns_to_cells(:body, record: record).dig(3)
@@ -98,7 +98,7 @@ module ActiveList
         code << "return #{var_name(:content)}.html_safe if options[:only] == 'content'\n"
 
         # Build whole
-        code << "return ('<div id=\"#{table.name}\" data-list-source=\"'+h(url_for(options.merge(:action => '#{generator.controller_method_name}')))+'\" class=\"active-list\">' + #{var_name(:content)} + '</div>').html_safe\n"
+        code << "return ('<div id=\"#{table.name}\" data-list-source=\"'+h(url_for(options.merge(:action => '#{generator.controller_method_name}')))+'\" data-list-redirect=\"' + params[:redirect].to_s + '\" class=\"active-list\">' + #{var_name(:content)} + '</div>').html_safe\n"
         return code
       end
 
@@ -175,10 +175,10 @@ module ActiveList
               elsif column.label_method.to_s.match(/(^|\_)country$/)  and column.datatype == :string
                 value_code = "(Nomen::Countries[#{value_code}]  ? (image_tag('countries/' + #{value_code}.to_s + '.png') + ' ' + Nomen::Countries[#{value_code}].human_name).html_safe : #{value_code})"
               else # if column.datatype == :string
-                value_code = "h(" + value_code + ".to_s)"
+                value_code = "h(#{value_code}.to_s)"
               end
 
-              value_code = "if #{record}\n" + value_code.dig + "end" if column.is_a?(ActiveList::Definition::AssociationColumn)
+              value_code = "if #{record}\n#{value_code.dig}end" if column.is_a?(ActiveList::Definition::AssociationColumn)
             end
           elsif column.is_a?(ActiveList::Definition::CheckBoxColumn)
             if nature == :body
