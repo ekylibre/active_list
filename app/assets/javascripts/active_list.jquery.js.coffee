@@ -28,6 +28,8 @@ ActiveList = {}
               .attr('checked', 'checked')
               .closest('tr').addClass('selected')
           AL.checkGlobalButtons list
+        list.trigger('page:change')
+        $(document).trigger('list:page:change')
         true
 
     false
@@ -87,6 +89,10 @@ ActiveList = {}
       page: page
     false
 
+  # Adds highlight effect
+  AL.highlightFocusedRows = () ->
+    console.log "Highlight"
+    $("*[data-list-source] tr.focus.focus-active").removeClass("focus-active")
   
   # Sort by one column
   $(document).on "click", "div[data-list-source] th[data-list-column][data-list-column-sort]", (event) ->
@@ -182,6 +188,8 @@ ActiveList = {}
     element.attr "title", element.html() unless title?
     return
 
+  $(document).on "cocoon:after-insert page:change", (event) ->
+    AL.highlightFocusedRows()
 
   return
 ) jQuery, ActiveList

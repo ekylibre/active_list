@@ -12,9 +12,23 @@ class PeopleControllerTest < ActionController::TestCase
     get :list, :format => :ods
     assert_response :success
 
-    # get :list, :format => :xcsv
-    # assert_response :success
+  end
 
+  test "parameters" do
+    get :list, "people-id" => 10
+    assert_response :success
+
+    get :list, page: 0
+    assert_response :success
+
+    get :list, page: 5, per_page: 25
+    assert_response :success
+
+    get :list, page: 50, per_page: 25
+    assert_response :success
+
+    get :list, page: 500, per_page: 25
+    assert_response :success
   end
   
 end

@@ -27,25 +27,36 @@ module ActiveList
         query_code << ".references(#{expr})"
       end
 
-      code = ""
+      code  = ""
       code << "#{var_name(:count)} = #{query_code}.count\n"
+
+      query_code << ".reorder(#{var_name(:order)})"
+
       if paginate
         code << "#{var_name(:limit)}  = (#{var_name(:params)}[:per_page] || 25).to_i\n"
-        code << "#{var_name(:page)}   = (#{var_name(:params)}[:page] || 1).to_i\n"
+
+        code << "if params[:page]\n"
+        code << "  #{var_name(:page)} = (#{var_name(:params)}[:page] || 1).to_i\n"
+        code << "elsif params['#{table.name}-id'] and #{var_name(:index)} = #{query_code}.pluck(:id).index(params['#{table.name}-id'].to_i)\n"
+        # Find page of request element
+        code << "  #{var_name(:page)} = (#{var_name(:index)}.to_f / #{var_name(:limit)}).floor + 1\n"
+        code << "else\n"
+        code << "  #{var_name(:page)} = 1\n"
+        code << "end\n"
         code << "#{var_name(:page)}   = 1 if #{var_name(:page)} < 1\n"
+
         code << "#{var_name(:offset)} = (#{var_name(:page)} - 1) * #{var_name(:limit)}\n"
         code << "#{var_name(:last)}   = (#{var_name(:count)}.to_f / #{var_name(:limit)}).ceil.to_i\n"
         code << "#{var_name(:last)}   = 1 if #{var_name(:last)} < 1\n"
+        
+
         code << "return #{self.view_method_name}(options.merge(page: 1)) if 1 > #{var_name(:page)}\n"
         code << "return #{self.view_method_name}(options.merge(page: #{var_name(:last)})) if #{var_name(:page)} > #{var_name(:last)}\n"
+        query_code << ".offset(#{var_name(:offset)})"
+        query_code << ".limit(#{var_name(:limit)})"
       end
-      code << "#{self.records_variable_name} = #{query_code}"
-      code << ".reorder(#{var_name(:order)})"
-      if paginate
-        code << ".offset(#{var_name(:offset)})"
-        code << ".limit(#{var_name(:limit)})"
-      end
-      code << " || {}\n"
+
+      code << "#{self.records_variable_name} = #{query_code} || {}\n"
       return code
     end
 

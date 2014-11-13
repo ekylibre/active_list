@@ -30,7 +30,7 @@ module ActiveList
         code << "  #{var_name(:params)}[:hidden_columns] << column if params[:visibility] == 'hidden'\n"
         code << "  head :ok\n"
         code << "elsif params[:only]\n"
-        code << "  render(inline: '<%=#{generator.view_method_name}(:only => params[:only])-%>')\n"
+        code << "  render(inline: '<%=#{generator.view_method_name}(only: params[:only])-%>')\n"
         code << "else\n"
         code << "  render(inline: '<%=#{generator.view_method_name}-%>')\n"
         code << "end\n"
@@ -46,19 +46,22 @@ module ActiveList
         extras = extras_code
 
         code  = generator.select_data_code
-        code << "#{var_name(:tbody)} = '<tbody data-total=\"'+#{var_name(:count)}.to_s+'\""
+        code << "#{var_name(:tbody)} = '<tbody data-total=\"' + #{var_name(:count)}.to_s + '\""
         if table.paginate?
-          code << " data-per-page=\"'+#{var_name(:limit)}.to_s+'\""
-          code << " data-pages-count=\"'+#{var_name(:last)}.to_s+'\""
+          code << " data-per-page=\"' + #{var_name(:limit)}.to_s + '\""
+          code << " data-pages-count=\"' + #{var_name(:last)}.to_s + '\""
         end
         code << ">'\n"
         code << "if #{var_name(:count)} > 0\n"
-        code << "  for #{record} in #{generator.records_variable_name}\n"
-        line_class = ""
+        code << "  #{generator.records_variable_name}.each do |#{record}|\n"
+        code << "    #{var_name(:attrs)} = {id: 'r' + #{record}.id.to_s}\n"
         if table.options[:line_class]
-          line_class = ", class: (" + recordify!(table.options[:line_class], record) + ").to_s"
+          code << "    #{var_name(:attrs)}[:class] = (#{recordify!(table.options[:line_class], record)}).to_s\n"
+          code << "    #{var_name(:attrs)}[:class] << ' focus focus-active' if params['#{table.name}-id'].to_i == #{record}.id\n"
+        else
+          code << "    #{var_name(:attrs)}[:class] = 'focus focus-active' if params['#{table.name}-id'].to_i == #{record}.id\n"
         end
-        code << "    #{var_name(:tbody)} << content_tag(:tr, id: 'r' + #{record}.id.to_s#{line_class}) do\n"
+        code << "    #{var_name(:tbody)} << content_tag(:tr, #{var_name(:attrs)}) do\n"
         code << columns_to_cells(:body, record: record).dig(3)
         code << "    end\n"
         # if table.options[:children].is_a? Symbol
@@ -367,7 +370,7 @@ module ActiveList
           classes << :unk
         end
         html = classes.join(' ').strip
-        if conds.size > 0
+        if conds.any?
           if without_interpolation
             html << "' + "
             html << conds.collect do |c|
