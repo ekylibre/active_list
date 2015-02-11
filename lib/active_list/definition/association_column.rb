@@ -23,7 +23,10 @@ module ActiveList
         else
           raise UnknownReflection, "Reflection #{reflection_name} cannot be found for #{table.model.name}."
         end
-        columns_def = @reflection.class_name.constantize.columns_hash.keys.map(&:to_sym)
+        unless klass = @reflection.class_name.constantize rescue nil
+          raise StandardError, "Given reflection #{reflection_name} seems to be invalid"
+        end
+        columns_def = klass.columns_hash.keys.map(&:to_sym)
         unless @label_method = @options.delete(:label_method)
           columns = columns_def + @reflection.class_name.constantize.instance_methods.map(&:to_sym)
           unless @label_method = LABELS_COLUMNS.detect{|m| columns.include?(m)}

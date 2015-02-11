@@ -7,7 +7,7 @@ class CreateContacts < ActiveRecord::Migration
       t.string :fax
       t.string :country
 
-      t.timestamps
+      t.timestamps null: false
     end
   end
 end

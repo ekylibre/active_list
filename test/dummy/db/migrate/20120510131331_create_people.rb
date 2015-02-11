@@ -5,7 +5,7 @@ class CreatePeople < ActiveRecord::Migration
       t.date :born_on
       t.decimal :height
 
-      t.timestamps
+      t.timestamps null: false
     end
   end
 end

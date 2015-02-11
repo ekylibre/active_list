@@ -140,7 +140,7 @@ module ActiveList
 
       def load_default_columns
         for column in self.model_columns
-          reflections = @model.reflections.values.select{|r| r.macro == :belongs_to and r.foreign_key.to_s == column.name.to_s}
+          reflections = @model.reflect_on_all_associations(:belongs_to).select{|r| r.foreign_key.to_s == column.name.to_s}
           if reflections.size == 1
             reflection = reflections.first
             columns = reflection.class_name.constantize.columns.collect{ |c| c.name.to_s }
