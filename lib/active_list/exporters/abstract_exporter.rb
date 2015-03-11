@@ -27,7 +27,7 @@ module ActiveList
         headers, columns = [], table.exportable_columns
         for column in columns
           datum = column.header_code
-          headers << (options[:encoding] ? datum+".to_s.encode('#{options[:encoding]}')" : datum)
+          headers << (options[:encoding] ? datum+".to_s.encode('#{options[:encoding]}', invalid: :replace, undef: :replace)" : datum)
         end
         return headers
       end
@@ -44,7 +44,7 @@ module ActiveList
             else
               datum = column.exporting_datum_code(record)
             end
-            array << (options[:encoding] ? datum+".to_s.encode('#{options[:encoding]}')" : datum)
+            array << (options[:encoding] ? datum+".to_s.encode('#{options[:encoding]}', invalid: :replace, undef: :replace)" : datum)
           end
         end
         return array
