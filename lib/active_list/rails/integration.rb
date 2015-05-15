@@ -36,7 +36,7 @@ module ActiveList
             helper_method = "_#{kontroller.controller_name}_#{__method__}_#{name || kontroller.controller_name}_tag".to_sym
             kontroller = kontroller.superclass
           end until self.respond_to?(helper_method)
-          return self.send(helper_method, &block)
+          return self.send(helper_method, options, &block)
         end
 
       end

@@ -51,6 +51,10 @@ module ActiveList
         return false
       end
 
+      def state_machine?
+        return false
+      end
+      
       def numeric?
         [:decimal, :integer, :float, :numeric].include? self.datatype
       end
