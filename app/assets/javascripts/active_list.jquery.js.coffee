@@ -21,13 +21,11 @@ ActiveList = {}
       dataType: "html"
       success: (data, status, request) ->
         content = $(data)
-        console.log content
         list_data = content.find(".list-data")
         list_control = content.find(".list-control")
         for type in ["actions", "pagination", "settings"]
-          $("*[data-list-ref='#{list_id}'].list-#{type}").html list_control.find(".list-#{type}")
+          $("*[data-list-ref='#{list_id}'].list-#{type}").replaceWith list_control.find(".list-#{type}")
         
-        console.log list_data
         list.find(".list-data").html(list_data)
         
         # list.html data
@@ -86,20 +84,6 @@ ActiveList = {}
       pattern = button.prop('hrefPattern')
       url = pattern.replace(encodeURIComponent("##IDS##"), selection.join(','), 'g')
       button.attr("href", url)
-
-
-  # # Move to given page
-  # AL.moveToPage = (element, page) ->
-  #   page_attr = undefined
-  #   page = element.data("list-move-to-page") if !page? or page is ""
-  #   alert "Cannot define which page to load: " + page if !page? or page is ""
-  #   if isNaN(page)
-  #     page_attr = page
-  #     page = element.attr(page_attr)
-  #     alert "Cannot define which page to load with attribute #{page_attr}: #{page}" if isNaN(page)
-  #   AL.refresh element,
-  #     page: page
-  #   false
 
   # Move to given page
   AL.moveToPage = (list, page) ->
@@ -181,31 +165,12 @@ ActiveList = {}
     pager = $(this)
     list = $("##{pager.closest('*[data-list-ref]').data('list-ref')}")
     AL.moveToPage list, pager.data("list-move-to-page")
-    false
 
   # Change page of table on input changes
   $(document).on "change", "*[data-list-ref] input[data-list-move-to-page]", (event) ->
     pager = $(this)
     list = $("##{pager.closest('*[data-list-ref]').data('list-ref')}")
     AL.moveToPage list, pager.data("list-move-to-page")
-    false
-
-  
-  # # 
-  # $(document).on "mouseovessr", "*[data-list-ref] a[data-list-actioner='many']", (event) ->
-  #   element = $(this)
-  #   list = element.closest("*[data-list-source]")
-  #   selection = list.prop('selection')
-  #   if selection?
-  #     unless element.prop('hrefPattern')?
-  #       element.prop('hrefPattern', element.attr('href'))
-  #     pattern = element.prop('hrefPattern')
-  #     url = pattern.replace(encodeURIComponent("##IDS##"), selection.join(','), 'g')
-  #     console.log url
-  #     element.attr("href", url)
-  #     console.log url
-  #   true
-
 
   return
 ) jQuery, ActiveList
