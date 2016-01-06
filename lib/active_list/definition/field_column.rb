@@ -1,7 +1,5 @@
 module ActiveList
-
   module Definition
-
     class FieldColumn < AbstractColumn
       attr_reader :form_name
 
@@ -14,7 +12,5 @@ module ActiveList
         "#{@table.model.name}.human_attribute_name('#{@name}')"
       end
     end
-
   end
-
 end

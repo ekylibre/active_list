@@ -1,0 +1,13 @@
+AllCops:
+  RunRailsCops: true
+  Exclude:
+    - 'tmp/**/*'
+    - 'test/dummy/tmp/**/*'
+    - 'test/dummy/db/schema.rb'
+    - 'test/dummy/vendor'
+
+Metrics/LineLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Max: 60

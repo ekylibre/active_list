@@ -1,7 +1,5 @@
 module ActiveList
-
   module Definition
-
     class AbstractColumn
       attr_reader :table, :name, :id, :options
 
@@ -10,11 +8,11 @@ module ActiveList
         @name    = name.to_sym
         @options = options
         @hidden  = !!@options.delete(:hidden)
-        @id = ActiveList.new_uid
+        @id = 'c' + @table.new_column_id # ActiveList.new_uid
       end
 
       def header_code
-        raise NotImplementedError, "#{self.class.name}#header_code is not implemented."
+        fail NotImplementedError, "#{self.class.name}#header_code is not implemented."
       end
 
       def hidden?
@@ -39,16 +37,13 @@ module ActiveList
         @id
       end
 
-      alias :sort_id :name
+      alias_method :sort_id, :name
 
       def check_options!(options, *keys)
         for key in options.keys
-          raise ArgumentError, "Key :#{key} is unexpected. (Expecting: #{keys.to_sentence})"
+          fail ArgumentError, "Key :#{key} is unexpected. (Expecting: #{keys.to_sentence})"
         end
       end
-
     end
-
   end
-
 end

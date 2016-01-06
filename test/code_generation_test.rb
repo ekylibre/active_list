@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class CodeGenerationTest < ActiveSupport::TestCase
-
   def test_generate_simple_table
     table = ActiveList::Definition::Table.new(:people)
     assert_nothing_raised do
@@ -27,5 +26,4 @@ class CodeGenerationTest < ActiveSupport::TestCase
     #   table.generate_view_method_code
     # end
   end
-
 end

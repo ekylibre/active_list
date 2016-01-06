@@ -11,5 +11,4 @@ class TableTest < ActiveSupport::TestCase
     table.column :address
     assert_equal 1, table.columns.size
   end
-
 end

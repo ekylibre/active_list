@@ -1,5 +1,4 @@
 module ActiveList
-
   module Definition
     autoload :AbstractColumn,    'active_list/definition/abstract_column'
     autoload :ActionColumn,      'active_list/definition/action_column'
@@ -13,5 +12,4 @@ module ActiveList
     autoload :Table,             'active_list/definition/table'
     autoload :TextFieldColumn,   'active_list/definition/text_field_column'
   end
-
 end

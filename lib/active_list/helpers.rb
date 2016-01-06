@@ -1,21 +1,20 @@
 module ActiveList
   module Helpers
-
     def recordify!(value, record_name)
       if value.is_a?(Symbol)
-        return record_name + "." + value.to_s
+        return record_name + '.' + value.to_s
       elsif value.is_a?(CodeString)
-        return "(" + value.gsub(/RECORD/, record_name) + ")"
+        return '(' + value.gsub(/RECORD/, record_name) + ')'
       else
-        raise ArgumentError, "CodeString or Symbol must be given to be recordified)"
+        fail ArgumentError, 'CodeString or Symbol must be given to be recordified)'
       end
     end
 
     def recordify(value, record_name)
       if value.is_a?(Symbol)
-        return record_name + "." + value.to_s
+        return record_name + '.' + value.to_s
       elsif value.is_a?(CodeString)
-        return "(" + value.gsub(/RECORD/, record_name) + ")"
+        return '(' + value.gsub(/RECORD/, record_name) + ')'
       else
         return value.inspect
       end
@@ -23,11 +22,10 @@ module ActiveList
 
     def urlify(value, record_name)
       if value.is_a?(CodeString)
-        return "(" + value.gsub(/RECORD/, record_name) + ")"
+        return '(' + value.gsub(/RECORD/, record_name) + ')'
       else
         return value.inspect
       end
     end
-
   end
 end

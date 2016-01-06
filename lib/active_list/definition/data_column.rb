@@ -1,9 +1,6 @@
 module ActiveList
-
   module Definition
-
     class DataColumn < AbstractColumn
-
       LABELS_COLUMNS = [:full_name, :label, :name, :number, :coordinate]
 
       def header_code
@@ -15,30 +12,30 @@ module ActiveList
       end
 
       # Code for exportation
-      def exporting_datum_code(record='record_of_the_death', noview=false)
-        datum = self.datum_code(record)
-        if self.datatype == :boolean
+      def exporting_datum_code(record = 'record_of_the_death', noview = false)
+        datum = datum_code(record)
+        if datatype == :boolean
           datum = "(#{datum} ? ::I18n.translate('list.export.true_value') : ::I18n.translate('list.export.false_value'))"
-        elsif self.datatype == :date
+        elsif datatype == :date
           datum = "(#{datum}.nil? ? '' : #{datum}.l)"
-        elsif self.datatype == :decimal and not noview
+        elsif datatype == :decimal && !noview
           currency = nil
-          if currency = self.options[:currency]
+          if currency = options[:currency]
             currency = currency[:body] if currency.is_a?(Hash)
             currency = :currency if currency.is_a?(TrueClass)
             currency = "#{record}.#{currency}".c if currency.is_a?(Symbol)
           end
           datum = "(#{datum}.nil? ? '' : #{datum}.l(#{'currency: ' + currency.inspect if currency}))"
-        elsif @name.to_s.match(/(^|\_)currency$/) and self.datatype == :string
+        elsif @name.to_s.match(/(^|\_)currency$/) && datatype == :string
           datum = "(Nomen::Currencies[#{datum}] ? Nomen::Currencies[#{datum}].human_name : '')"
-        elsif @name.to_s.match(/(^|\_)country$/) and  self.datatype == :string
+        elsif @name.to_s.match(/(^|\_)country$/) && datatype == :string
           datum = "(Nomen::Countries[#{datum}] ? Nomen::Countries[#{datum}].human_name : '')"
-        elsif @name.to_s.match(/(^|\_)language$/) and self.datatype == :string
+        elsif @name.to_s.match(/(^|\_)language$/) && datatype == :string
           datum = "(Nomen::Languages[#{datum}] ? Nomen::Languages[#{datum}].human_name : '')"
         elsif self.enumerize?
           datum = "(#{datum}.nil? ? '' : #{datum}.text)"
         end
-        return datum
+        datum
       end
 
       # Returns the data type of the column if the column is in the database
@@ -46,17 +43,16 @@ module ActiveList
         @options[:datatype] || (@column ? @column.type : nil)
       end
 
-
       def enumerize?
-        return false
+        false
       end
 
       def state_machine?
-        return false
+        false
       end
-      
+
       def numeric?
-        [:decimal, :integer, :float, :numeric].include? self.datatype
+        [:decimal, :integer, :float, :numeric].include? datatype
       end
 
       # Returns the size/length of the column if the column is in the database
@@ -73,20 +69,17 @@ module ActiveList
       def sortable?
         return true
         # not self.action? and
-        not self.options[:through] and not @column.nil?
+        !options[:through] && !@column.nil?
       end
 
       # Generate code in order to get the (foreign) record of the column
       def record_expr(record = 'record_of_the_death')
-        return record
+        record
       end
 
       def sort_expression
-        raise NotImplementedError, "sort_expression must be implemented"
+        fail NotImplementedError, 'sort_expression must be implemented'
       end
-
     end
-
   end
-
 end

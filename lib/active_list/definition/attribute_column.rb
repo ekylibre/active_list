@@ -1,9 +1,6 @@
 module ActiveList
-
   module Definition
-
     class AttributeColumn < DataColumn
-
       attr_reader :column, :label_method, :sort_column
 
       def initialize(table, name, options = {})
@@ -18,31 +15,31 @@ module ActiveList
             @sort_column = :id
           end
         end
-        @column  = @table.model.columns_hash[@label_method.to_s]
+        @column = @table.model.columns_hash[@label_method.to_s]
       end
 
       # Code for rows
       def datum_code(record = 'record_of_the_death', child = false)
-        code = ""
+        code = ''
         if child
           if @options[:children].is_a?(FalseClass)
-            code = "nil"
+            code = 'nil'
           else
             code = "#{record}.#{table.options[:children]}.#{@options[:children] || @label_method}"
           end
         else
           code = "#{record}.#{@label_method}"
         end
-        return code.c
+        code.c
       end
 
       # Returns the class name of the used model
       def class_name
-        return self.table.model.name
+        table.model.name
       end
 
       def enumerize?
-        self.table.model.send(@label_method).send(:values)
+        table.model.send(@label_method).send(:values)
         return true
       rescue
         return false
@@ -51,8 +48,6 @@ module ActiveList
       def sort_expression
         "#{@table.model.table_name}.#{@sort_column}"
       end
-
     end
-
   end
 end
