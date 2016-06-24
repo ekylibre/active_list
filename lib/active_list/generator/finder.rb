@@ -90,7 +90,7 @@ module ActiveList
           code << conditions[1..-1].collect { |p| ', ' + sanitize_condition(p) }.join if conditions.size > 1
           code << ']'
         when Symbol # Method
-          fail 'What?'
+          fail 'What?' # Amazingly explicit.
         # code << conditions.first.to_s + '('
         # code << conditions[1..-1].collect { |p| sanitize_condition(p) }.join(', ') if conditions.size > 1
         # code << ')'

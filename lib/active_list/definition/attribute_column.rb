@@ -12,7 +12,7 @@ module ActiveList
           elsif @table.model.columns_hash[@name.to_s]
             @sort_column = @name
           else
-            @sort_column = :id
+            @sort_column = nil
           end
         end
         @column = @table.model.columns_hash[@label_method.to_s]
@@ -36,6 +36,10 @@ module ActiveList
       # Returns the class name of the used model
       def class_name
         table.model.name
+      end
+
+      def sortable?
+        !sort_column.nil?
       end
 
       def enumerize?
