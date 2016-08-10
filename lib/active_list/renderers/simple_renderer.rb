@@ -107,7 +107,7 @@ module ActiveList
         # code << "return #{var_name(:content)}.html_safe if options[:only] == 'content'\n"
 
         # Build whole
-        code << "return ('<div id=\"#{uid}\" data-list-source=\"'+h(url_for(ActionController::Parameters.new(options.merge(:action => '#{generator.controller_method_name}'))))+'\" data-list-redirect=\"' + params[:redirect].to_s + '\" class=\"active-list\">' + #{var_name(:content)} + '</div>').html_safe\n"
+        code << "return ('<div id=\"#{uid}\" data-list-source=\"'+h(url_for(options.merge(:action => '#{generator.controller_method_name}')))+'\" data-list-redirect=\"' + params[:redirect].to_s + '\" class=\"active-list\">' + #{var_name(:content)} + '</div>').html_safe\n"
         code
       end
 
