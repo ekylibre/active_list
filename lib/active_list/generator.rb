@@ -108,7 +108,9 @@ module ActiveList
       code << "#{var_name(:order)} = #{@table.options[:order] ? @table.options[:order].inspect : 'nil'}\n"
       code << "if #{var_name(:col)} = {" + @table.sortable_columns.collect { |c| "'#{c.sort_id}' => '#{c.sort_expression}'" }.join(', ') + "}[#{var_name(:params)}[:sort]]\n"
       code << "  #{var_name(:params)}[:dir] = 'asc' unless #{var_name(:params)}[:dir] == 'asc' or #{var_name(:params)}[:dir] == 'desc'\n"
-      code << "  #{var_name(:order)} = #{var_name(:col)} + ' ' + #{var_name(:params)}[:dir]\n"
+      code << "  null_pos = 'first' if #{var_name(:params)}[:dir] == 'asc'\n"
+      code << "  null_pos = 'last' if #{var_name(:params)}[:dir] == 'desc'\n"
+      code << "  #{var_name(:order)} = #{var_name(:col)} + ' ' + #{var_name(:params)}[:dir] + ' NULLS ' + null_pos \n"
       code << "end\n"
 
       code
