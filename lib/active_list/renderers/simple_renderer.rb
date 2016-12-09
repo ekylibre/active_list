@@ -302,8 +302,8 @@ module ActiveList
           code << " data-list-column-sort=\"'+(#{var_name(:params)}[:sort] != '#{column.sort_id}' ? 'asc' : #{var_name(:params)}[:dir] == 'asc' ? 'desc' : 'asc')+'\"" if column.sortable?
           code << " data-list-column-computation=\"#{column.computation_method}\"" if column.computable?
           if column.is_a?(ActiveList::Definition::DataColumn) && column.options[:currency]
-            code << " data-list-column-currency-symbol=\"' + Nomen::Currencies[#{generator.records_variable_name}.first.currency].symbol + '\""
-            code << " data-list-column-currency-precision=\"' + Nomen::Currencies[#{generator.records_variable_name}.first.currency].precision.to_s + '\""
+            code << " data-list-column-currency-symbol=\"' + Nomen::Currencies[#{generator.records_variable_name}.first && #{generator.records_variable_name}.first.currency].symbol + '\""
+            code << " data-list-column-currency-precision=\"' + Nomen::Currencies[#{generator.records_variable_name}.first && #{generator.records_variable_name}.first.currency].precision.to_s + '\""
           end
           code << " class=\"#{column_classes(column, true, true)}\""
           code << '>'
