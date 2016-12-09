@@ -293,7 +293,11 @@ module ActiveList
       # Produces the code to create the header line using  top-end menu for columns
       # and pagination management
       def header_code
-        code = "'<thead><tr>"
+        code = ''
+        if table.columns.any? { |column| column.is_a?(ActiveList::Definition::DataColumn) && column.options[:currency] }
+          code << "currency = Nomen::Currencies[#{generator.records_variable_name}.first.currency] if #{generator.records_variable_name}.any?\n"
+        end
+        code << "'<thead><tr>"
         code << "<th class=\"list-selector\"></th>" if table.selectable?
         for column in table.columns
           next if column.is_a?(ActiveList::Definition::ActionColumn) && !column.use_single?
@@ -302,8 +306,8 @@ module ActiveList
           code << " data-list-column-sort=\"'+(#{var_name(:params)}[:sort] != '#{column.sort_id}' ? 'asc' : #{var_name(:params)}[:dir] == 'asc' ? 'desc' : 'asc')+'\"" if column.sortable?
           code << " data-list-column-computation=\"#{column.computation_method}\"" if column.computable?
           if column.is_a?(ActiveList::Definition::DataColumn) && column.options[:currency]
-            code << " data-list-column-currency-symbol=\"' + Nomen::Currencies[#{generator.records_variable_name}.first && #{generator.records_variable_name}.first.currency].symbol + '\""
-            code << " data-list-column-currency-precision=\"' + Nomen::Currencies[#{generator.records_variable_name}.first && #{generator.records_variable_name}.first.currency].precision.to_s + '\""
+            code << " data-list-column-currency-symbol=\"' + (currency ? currency.symbol : '') + '\""
+            code << " data-list-column-currency-precision=\"' + (currency ? currency.precision.to_s : '') + '\""
           end
           code << " class=\"#{column_classes(column, true, true)}\""
           code << '>'
