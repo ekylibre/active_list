@@ -1,5 +1,8 @@
 en: &en
   list:
+    results:
+      sum: "Total"
+      average: "Average"
     columns: "Columns"
     export:
       false_value: "FALSE"

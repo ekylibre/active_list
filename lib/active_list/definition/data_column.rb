@@ -69,7 +69,7 @@ module ActiveList
       def sortable?
         return true
         # not self.action? and
-        !options[:through] && !@column.nil?
+        #!options[:through] && !@column.nil?
       end
 
       # Generate code in order to get the (foreign) record of the column

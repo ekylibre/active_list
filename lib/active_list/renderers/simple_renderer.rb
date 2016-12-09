@@ -70,6 +70,31 @@ module ActiveList
         #   code << "    end\n"
         # end
         code << "  end\n"
+
+        if table.columns.any?(&:computable?)
+          code << "  #{var_name(:tbody)} << content_tag(:tr, id: :'computation-results') do\n"
+          code << "    computation_row = ''\n"
+          code << " computation_row << '<td></td>'\n" if table.selectable?
+          table.columns.each do |column|
+            classes = []
+            value = ''
+            code << "    computation_row << \"<td"
+            if column.computable?
+              code << " data-list-result-for='#{column.short_id}'"
+              value = "<div><span><strong>#{I18n.translate("list.results.#{column.computation_method}")}:</strong></span>"
+              value << "<span id='list-computation-result'></span></div>"
+            end
+            if column.is_a? ActiveList::Definition::DataColumn
+              code << "\#\{' class=hidden' if #{var_name(:params)}[:hidden_columns].include?(:#{column.name})\}"
+            end
+            code << ">"
+            code << value
+            code << "</td>\"\n"
+          end
+          code << "    computation_row.html_safe\n"
+          code << "  end\n"
+        end
+
         code << "else\n"
         code << "  #{var_name(:tbody)} << '<tr class=\"empty\"><td colspan=\"#{table.columns.size + 1}\">' + ::I18n.translate('list.no_records') + '</td></tr>'\n"
         code << "end\n"
@@ -108,6 +133,7 @@ module ActiveList
 
         # Build whole
         code << "return ('<div id=\"#{uid}\" data-list-source=\"'+h(url_for(options.merge(:action => '#{generator.controller_method_name}')))+'\" data-list-redirect=\"' + params[:redirect].to_s + '\" class=\"active-list\">' + #{var_name(:content)} + '</div>').html_safe\n"
+        File.open('debug-activelist', 'w') { |file| file.write code } if uid == "sales-list"
         code
       end
 
@@ -210,7 +236,10 @@ module ActiveList
           else
             value_code = "'&#160;&#8709;&#160;'.html_safe"
           end
-          code << "content_tag(:td, :class => \"#{column_classes(column)}\") do\n"
+          code << "content_tag(:td, :class => \"#{column_classes(column)}\","
+          code << " data: { \"list-column-header\": \"#{column.short_id}\","
+          code << " \"list-cell-value\": \"\#{#{column.datum_code(record, children_mode)}}\"" if column.computable?
+          code << " } ) do\n"
           code << value_code.dig
           code << "end +\n"
         end
@@ -271,6 +300,11 @@ module ActiveList
           code << "<th data-list-column=\"#{column.sort_id}\""
           code << " data-list-column-cells=\"#{column.short_id}\""
           code << " data-list-column-sort=\"'+(#{var_name(:params)}[:sort] != '#{column.sort_id}' ? 'asc' : #{var_name(:params)}[:dir] == 'asc' ? 'desc' : 'asc')+'\"" if column.sortable?
+          code << " data-list-column-computation=\"#{column.computation_method}\"" if column.computable?
+          if column.is_a?(ActiveList::Definition::DataColumn) && column.options[:currency]
+            code << " data-list-column-currency-symbol=\"' + Nomen::Currencies[#{generator.records_variable_name}.first.currency].symbol + '\""
+            code << " data-list-column-currency-precision=\"' + Nomen::Currencies[#{generator.records_variable_name}.first.currency].precision.to_s + '\""
+          end
           code << " class=\"#{column_classes(column, true, true)}\""
           code << '>'
           code << "' + h(#{column.header_code}) + '"

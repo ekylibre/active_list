@@ -1,6 +1,9 @@
 jp: &jp
   list:
     columns: "列"
+    # results:
+    #   sum: "Total"
+    #   average: "Moyenne"
     export:
       false_value: "偽"
       formats:

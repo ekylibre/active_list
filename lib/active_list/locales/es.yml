@@ -1,6 +1,9 @@
 es: &es
   list:
     columns: "Columnas"
+    # results:
+    #   sum: "Total"
+    #   average: "Moyenne"
     export:
       false_value: "FALSO"
       formats:

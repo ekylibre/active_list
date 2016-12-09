@@ -1,7 +1,7 @@
 module ActiveList
   module Definition
     class AttributeColumn < DataColumn
-      attr_reader :column, :label_method, :sort_column
+      attr_reader :column, :label_method, :sort_column, :computation_method
 
       def initialize(table, name, options = {})
         super(table, name, options)
@@ -15,6 +15,7 @@ module ActiveList
             @sort_column = nil
           end
         end
+        @computation_method = options[:on_select]
         @column = @table.model.columns_hash[@label_method.to_s]
       end
 
@@ -40,6 +41,10 @@ module ActiveList
 
       def sortable?
         !sort_column.nil?
+      end
+
+      def computable?
+        !computation_method.nil?
       end
 
       def enumerize?

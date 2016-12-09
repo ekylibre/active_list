@@ -1,6 +1,9 @@
 ar: &ar
   list:
     # columns: "Columns"
+    # results:
+    #   sum: "Total"
+    #   average: "Moyenne"
     export:
       false_value: "زائف"
       formats:

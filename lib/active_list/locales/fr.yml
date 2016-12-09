@@ -1,6 +1,9 @@
 fr: &fr
   list:
     columns: "Colonnes"
+    results:
+      sum: "Total"
+      average: "Moyenne"
     export:
       false_value: "FAUX"
       formats:

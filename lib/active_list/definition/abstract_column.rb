@@ -27,6 +27,10 @@ module ActiveList
         false
       end
 
+      def computable?
+        false
+      end
+
       # Unique identifier of the column in the application
       def unique_id
         "#{@table.name}-#{@name}"
