@@ -133,7 +133,7 @@ module ActiveList
 
         # Build whole
         code << "return ('<div id=\"#{uid}\" data-list-source=\"'+h(url_for(options.merge(:action => '#{generator.controller_method_name}')))+'\" data-list-redirect=\"' + params[:redirect].to_s + '\" class=\"active-list\">' + #{var_name(:content)} + '</div>').html_safe\n"
-        File.open('debug-activelist', 'w') { |file| file.write code } if uid == "sales-list"
+        # File.open('debug-activelist', 'w') { |file| file.write code }
         code
       end
 
