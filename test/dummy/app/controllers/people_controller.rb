@@ -1,5 +1,7 @@
 class PeopleController < ApplicationController
-  list
+  list do |t|
+    t.column :balance_amount, currency: true
+  end
 
   # GET /people
   # GET /people.json

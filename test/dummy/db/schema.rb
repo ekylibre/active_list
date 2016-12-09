@@ -27,8 +27,10 @@ ActiveRecord::Schema.define(version: 20120510134500) do
     t.string   "name"
     t.date     "born_on"
     t.decimal  "height"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.decimal  "balance_amount"
+    t.string   "currency"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
   end
 
 end
