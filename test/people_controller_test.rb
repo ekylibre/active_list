@@ -1,3 +1,4 @@
+require 'byebug'
 require 'test_helper'
 
 class PeopleControllerTest < ActionController::TestCase
@@ -10,6 +11,11 @@ class PeopleControllerTest < ActionController::TestCase
 
     get :list, format: :ods
     assert_response :success
+  end
+
+  test 'rendering on empty list' do
+    Person.destroy_all
+    get :list
   end
 
   test 'parameters' do
