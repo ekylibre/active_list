@@ -76,7 +76,6 @@ module ActiveList
           code << "    computation_row = ''\n"
           code << " computation_row << '<td></td>'\n" if table.selectable?
           table.columns.each do |column|
-            classes = []
             value = ''
             code << "    computation_row << \"<td"
             if column.computable?
@@ -85,7 +84,7 @@ module ActiveList
               value << "<span id='list-computation-result'></span></div>"
             end
             if column.is_a? ActiveList::Definition::DataColumn
-              code << "\#\{' class=hidden' if #{var_name(:params)}[:hidden_columns].include?(:#{column.name})\}"
+              code << "\#\{' class=\"#{column.short_id}' + (#{var_name(:params)}[:hidden_columns].include?(:#{column.name}) ? ' hidden\"' : '\"')\}"
             end
             code << ">"
             code << value
