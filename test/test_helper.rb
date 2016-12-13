@@ -7,7 +7,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'active_list'
 dummy_path = Pathname.new(__FILE__).dirname.join('dummy')
 
-ENV["BUNDLE_GEMFILE"] = ""
+ENV['BUNDLE_GEMFILE'] = ''
 Kernel.system("cd #{dummy_path} && bundle install && bundle exec rake db:drop db:create db:migrate db:seed RAILS_ENV=test")
 
 # CURRENT FILE :: test/test_helper.rb
@@ -27,8 +27,8 @@ module ActionView
     module Nomen
       class Currencies
         def self.[](_)
-          klass = Struct.const_defined?(:Currency) ? Struct::Currency : Struct.new("Currency", :precision, :symbol)
-          return klass.new(2, "€")
+          klass = Struct.const_defined?(:Currency) ? Struct::Currency : Struct.new('Currency', :precision, :symbol)
+          klass.new(2, '€')
         end
       end
     end

@@ -6,7 +6,7 @@ module ActiveList
       def initialize(table, name, options = {})
         super(table, name, options)
         unless @options[:through]
-          fail ArgumentError, 'Option :through must be given'
+          raise ArgumentError, 'Option :through must be given'
         end
         reflection_name = @options.delete(:through).to_sym
         if @reflection = @table.model.reflect_on_association(reflection_name)
@@ -15,23 +15,23 @@ module ActiveList
           elsif @reflection.macro == :has_one
           # Do some stuff
           else
-            fail ArgumentError, "Only belongs_to are usable. Can't handle: #{reflection.macro} :#{reflection.name}."
+            raise ArgumentError, "Only belongs_to are usable. Can't handle: #{reflection.macro} :#{reflection.name}."
           end
         else
-          fail UnknownReflection, "Reflection #{reflection_name} cannot be found for #{table.model.name}."
+          raise UnknownReflection, "Reflection #{reflection_name} cannot be found for #{table.model.name}."
         end
         unless klass = begin
                          @reflection.class_name.constantize
                        rescue
                          nil
                        end
-          fail StandardError, "Given reflection #{reflection_name} seems to be invalid"
+          raise StandardError, "Given reflection #{reflection_name} seems to be invalid"
         end
         columns_def = klass.columns_hash.keys.map(&:to_sym)
         unless @label_method = @options.delete(:label_method)
           columns = columns_def + @reflection.class_name.constantize.instance_methods.map(&:to_sym)
           unless @label_method = LABELS_COLUMNS.detect { |m| columns.include?(m) }
-            fail ArgumentError, ":label_method option must be given for association #{name}. (#{columns.inspect})"
+            raise ArgumentError, ":label_method option must be given for association #{name}. (#{columns.inspect})"
           end
         end
         unless @sort_column = @options.delete(:sort)
@@ -48,16 +48,16 @@ module ActiveList
       # Code for rows
       def datum_code(record = 'record_of_the_death', child = false)
         code = ''
-        if child
-          code = 'nil'
-        # if @options[:children].is_a?(FalseClass)
-        #   code = "nil"
-        # else
-        #   code = "#{record}.#{table.options[:children]}.#{@reflection.name}.#{@options[:children] || @label_method}"
-        # end
-        else
-          code = "(#{record}.#{@reflection.name} ? #{record}.#{@reflection.name}.#{@label_method} : nil)"
-        end
+        code = if child
+                 'nil'
+               # if @options[:children].is_a?(FalseClass)
+               #   code = "nil"
+               # else
+               #   code = "#{record}.#{table.options[:children]}.#{@reflection.name}.#{@options[:children] || @label_method}"
+               # end
+               else
+                 "(#{record}.#{@reflection.name} ? #{record}.#{@reflection.name}.#{@label_method} : nil)"
+               end
         code.c
       end
 

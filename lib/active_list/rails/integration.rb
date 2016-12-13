@@ -29,7 +29,7 @@ module ActiveList
           begin
             helper_method = "_#{kontroller.controller_name}_#{__method__}_#{name || kontroller.controller_name}_tag".to_sym
             kontroller = kontroller.superclass
-          end until self.respond_to?(helper_method)
+          end until respond_to?(helper_method)
           send(helper_method, options, &block)
         end
       end

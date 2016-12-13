@@ -12,7 +12,7 @@ module ActiveList
       end
 
       def header_code
-        fail NotImplementedError, "#{self.class.name}#header_code is not implemented."
+        raise NotImplementedError, "#{self.class.name}#header_code is not implemented."
       end
 
       def hidden?
@@ -41,11 +41,11 @@ module ActiveList
         @id
       end
 
-      alias_method :sort_id, :name
+      alias sort_id name
 
       def check_options!(options, *keys)
         for key in options.keys
-          fail ArgumentError, "Key :#{key} is unexpected. (Expecting: #{keys.to_sentence})"
+          raise ArgumentError, "Key :#{key} is unexpected. (Expecting: #{keys.to_sentence})"
         end
       end
     end

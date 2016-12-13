@@ -16,7 +16,7 @@ module ActiveList
         text:      :txt,
         time:      :tim,
         timestamp: :dtt
-      }
+      }.freeze
 
       def remote_update_code
         code = "if params[:column] && params[:visibility]\n"
@@ -77,7 +77,7 @@ module ActiveList
           code << " computation_row << '<td></td>'\n" if table.selectable?
           table.columns.each do |column|
             value = ''
-            code << "    computation_row << \"<td"
+            code << '    computation_row << "<td'
             if column.computable?
               code << " data-list-result-for='#{column.short_id}'"
               value = "<div><span><strong>#{I18n.translate("list.results.#{column.computation_method}")}:</strong></span>"
@@ -86,7 +86,7 @@ module ActiveList
             if column.is_a? ActiveList::Definition::DataColumn
               code << "\#\{' class=\"#{column.short_id}' + (#{var_name(:params)}[:hidden_columns].include?(:#{column.name}) ? ' hidden\"' : '\"')\}"
             end
-            code << ">"
+            code << '>'
             code << value
             code << "</td>\"\n"
           end
@@ -139,7 +139,7 @@ module ActiveList
       def columns_to_cells(nature, options = {})
         code = ''
         unless [:body, :children].include?(nature)
-          fail ArgumentError, 'Nature is invalid'
+          raise ArgumentError, 'Nature is invalid'
         end
         record = options[:record] || 'record_of_the_death'
         if table.selectable?
@@ -263,7 +263,7 @@ module ActiveList
           list = [5, 10, 20, 50, 100, 200]
           list << table.options[:per_page].to_i if table.options[:per_page].to_i > 0
           list = list.uniq.sort
-          menu << "<li class=\"parent\">"
+          menu << '<li class="parent">'
           menu << "<a class=\"pages\"><i></i>' + h('list.items_per_page'.t) + '</a><ul>"
           for n in list
             menu << "<li data-list-change-page-size=\"#{n}\" '+(#{var_name(:params)}[:per_page] == #{n} ? ' class=\"check\"' : '') + '><a><i></i>' + h('list.x_per_page'.t(count: #{n})) + '</a></li>"
@@ -272,7 +272,7 @@ module ActiveList
         end
 
         # Column selector
-        menu << "<li class=\"parent\">"
+        menu << '<li class="parent">'
         menu << "<a class=\"columns\"><i></i>' + h('list.columns'.t) + '</a><ul>"
         for column in table.data_columns
           menu << "<li data-list-toggle-column=\"#{column.name}\" class=\"' + (#{var_name(:params)}[:hidden_columns].include?(:#{column.name}) ? 'unchecked' : 'checked') + '\"><a><i></i>' + h(#{column.header_code}) + '</a></li>"
@@ -280,9 +280,9 @@ module ActiveList
         menu << '</ul></li>'
 
         # Separator
-        menu << "<li class=\"separator\"></li>"
+        menu << '<li class="separator"></li>'
         # Exports
-        ActiveList.exporters.each do |format, exporter|
+        ActiveList.exporters.each do |format, _exporter|
           menu << "<li class=\"export export-#{format}\">' + link_to(content_tag(:i) + h('list.export_as'.t(exported: :#{format}.t(scope: 'list.export.formats'))), params.merge(action: :#{generator.controller_method_name}, sort: #{var_name(:params)}[:sort], dir: #{var_name(:params)}[:dir], format: '#{format}')) + '</li>"
         end
         menu << '</ul></span>'
@@ -294,7 +294,7 @@ module ActiveList
       def header_code
         code = ''
         code << "'<thead><tr>"
-        code << "<th class=\"list-selector\"></th>" if table.selectable?
+        code << '<th class="list-selector"></th>' if table.selectable?
         table.columns.each do |column|
           next if column.is_a?(ActiveList::Definition::ActionColumn) && !column.use_single?
           code << "<th data-list-column=\"#{column.sort_id}\""
@@ -302,7 +302,7 @@ module ActiveList
           code << " data-list-column-sort=\"'+(#{var_name(:params)}[:sort] != '#{column.sort_id}' ? 'asc' : #{var_name(:params)}[:dir] == 'asc' ? 'desc' : 'asc')+'\"" if column.sortable?
           code << " data-list-column-computation=\"#{column.computation_method}\"" if column.computable?
           if table.selectable? && column.is_a?(ActiveList::Definition::DataColumn) && column.options[:currency] &&
-            code << " data-list-column-currency-symbol=\"' + (#{generator.records_variable_name}.any? ? Nomen::Currency.find(#{column.currency_for(generator.records_variable_name + '.first').inspect} || 'EUR').symbol.to_s : '') + '\""
+             code << " data-list-column-currency-symbol=\"' + (#{generator.records_variable_name}.any? ? Nomen::Currency.find(#{column.currency_for(generator.records_variable_name + '.first').inspect} || 'EUR').symbol.to_s : '') + '\""
             code << " data-list-column-currency-precision=\"' + (#{generator.records_variable_name}.any? ? Nomen::Currency.find(#{column.currency_for(generator.records_variable_name + '.first').inspect} || 'EUR').precision.to_s : '') + '\""
           end
           code << " class=\"#{column_classes(column, true, true)}\""
@@ -339,13 +339,13 @@ module ActiveList
 
         if table.paginate?
           pagination = ''
-          current_page = "#{var_name(:page)}"
-          last_page = "#{var_name(:last)}"
+          current_page = var_name(:page).to_s
+          last_page = var_name(:last).to_s
 
           pagination << "<span class=\"list-pagination\" data-list-ref=\"#{uid}\">"
           pagination << "<span class=\"status\">' + 'list.pagination.x_to_y_of_total'.t(x: (#{var_name(:offset)} + (#{var_name(:count)} > 0 ? 1 : 0)), y: ((#{var_name(:last)} == #{var_name(:page)}) ? #{var_name(:count)} : #{var_name(:offset)} + #{var_name(:limit)}), total: #{var_name(:count)}) + '</span>"
 
-          pagination << "<span class=\"paginator\">"
+          pagination << '<span class="paginator">'
           pagination << "<a href=\"#\" data-list-move-to-page=\"' + (#{current_page} - 1).to_s + '\" class=\"btn previous-page\"' + (#{current_page} != 1 ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.previous') + '</a>"
 
           x = '@@PAGE-NUMBER@@'

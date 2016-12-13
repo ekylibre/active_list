@@ -24,11 +24,11 @@ module ActiveList
   # Set the temporary directory
   # Pathname or callable are acceptable
   def self.temporary_directory=(dir)
-    if dir.respond_to?(:call) || dir.is_a?(Pathname)
-      @@temporary_directory = dir
-    else
-      @@temporary_directory = Pathname(dir)
-    end
+    @@temporary_directory = if dir.respond_to?(:call) || dir.is_a?(Pathname)
+                              dir
+                            else
+                              Pathname(dir)
+                            end
   end
 
   # Returns the temporary directory
@@ -45,7 +45,7 @@ module ActiveList
 
   def self.register_renderer(name, renderer)
     unless renderer < ActiveList::Renderers::AbstractRenderer
-      fail ArgumentError, 'A renderer must be ActiveList::Renderers::Renderer'
+      raise ArgumentError, 'A renderer must be ActiveList::Renderers::Renderer'
     end
     @@renderers[name] = renderer
   end
@@ -55,7 +55,7 @@ module ActiveList
 
   def self.register_exporter(name, exporter)
     unless exporter < ActiveList::Exporters::AbstractExporter
-      fail ArgumentError, "ActiveList::Exporters::AbstractExporter expected (got #{exporter.name}/#{exporter.ancestors.inspect})"
+      raise ArgumentError, "ActiveList::Exporters::AbstractExporter expected (got #{exporter.name}/#{exporter.ancestors.inspect})"
     end
     @@exporters[name] = exporter
   end

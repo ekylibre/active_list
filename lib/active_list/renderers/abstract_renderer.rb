@@ -13,11 +13,11 @@ module ActiveList
       end
 
       def remote_update_code
-        fail NotImplementedError, "#{self.class.name}#remote_update_code is not implemented."
+        raise NotImplementedError, "#{self.class.name}#remote_update_code is not implemented."
       end
 
       def build_data_code
-        fail NotImplementedError, "#{self.class.name}#build_table_code is not implemented."
+        raise NotImplementedError, "#{self.class.name}#build_table_code is not implemented."
       end
     end
   end

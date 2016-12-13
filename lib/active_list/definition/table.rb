@@ -158,14 +158,14 @@ module ActiveList
                 end
         if klass && klass < AbstractColumn
           unless name.is_a?(Symbol)
-            fail ArgumentError, "Name of a column must be a Symbol (got #{name.inspect})."
+            raise ArgumentError, "Name of a column must be a Symbol (got #{name.inspect})."
           end
           if @columns.detect { |c| c.name == name }
-            fail ArgumentError, "Column name must be unique. #{name.inspect} is already used in #{self.name}"
+            raise ArgumentError, "Column name must be unique. #{name.inspect} is already used in #{self.name}"
           end
           @columns << klass.new(self, name, options)
         else
-          fail ArgumentError, "Invalid column type: #{type.inspect}"
+          raise ArgumentError, "Invalid column type: #{type.inspect}"
         end
       end
     end

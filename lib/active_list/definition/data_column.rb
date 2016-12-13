@@ -1,7 +1,7 @@
 module ActiveList
   module Definition
     class DataColumn < AbstractColumn
-      LABELS_COLUMNS = [:full_name, :label, :name, :number, :coordinate]
+      LABELS_COLUMNS = [:full_name, :label, :name, :number, :coordinate].freeze
 
       def header_code
         if @options[:label]
@@ -27,7 +27,7 @@ module ActiveList
           datum = "(Nomen::Countries[#{datum}] ? Nomen::Countries[#{datum}].human_name : '')"
         elsif @name.to_s.match(/(^|\_)language$/) && datatype == :string
           datum = "(Nomen::Languages[#{datum}] ? Nomen::Languages[#{datum}].human_name : '')"
-        elsif self.enumerize?
+        elsif enumerize?
           datum = "(#{datum}.nil? ? '' : #{datum}.text)"
         end
         datum
@@ -72,9 +72,9 @@ module ActiveList
 
       # Check if a column is sortable
       def sortable?
-        return true
+        true
         # not self.action? and
-        #!options[:through] && !@column.nil?
+        # !options[:through] && !@column.nil?
       end
 
       # Generate code in order to get the (foreign) record of the column
@@ -83,7 +83,7 @@ module ActiveList
       end
 
       def sort_expression
-        fail NotImplementedError, 'sort_expression must be implemented'
+        raise NotImplementedError, 'sort_expression must be implemented'
       end
     end
   end

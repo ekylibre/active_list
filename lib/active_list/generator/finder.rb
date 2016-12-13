@@ -11,10 +11,10 @@ module ActiveList
       end
 
       class_name = @table.model.name
-      class_name = "(controller_name != '#{class_name.tableize}' ? controller_name.to_s.classify.constantize : #{class_name})" if self.collection?
+      class_name = "(controller_name != '#{class_name.tableize}' ? controller_name.to_s.classify.constantize : #{class_name})" if collection?
 
       # Find data
-      query_code = "#{class_name}"
+      query_code = class_name.to_s
       query_code << scope_code if scope_code
       query_code << ".select(#{select_code})" if select_code
       query_code << ".where(#{conditions_code})" unless @table.options[:conditions].blank?
@@ -90,12 +90,12 @@ module ActiveList
           code << conditions[1..-1].collect { |p| ', ' + sanitize_condition(p) }.join if conditions.size > 1
           code << ']'
         when Symbol # Method
-          fail 'What?' # Amazingly explicit.
+          raise 'What?' # Amazingly explicit.
         # code << conditions.first.to_s + '('
         # code << conditions[1..-1].collect { |p| sanitize_condition(p) }.join(', ') if conditions.size > 1
         # code << ')'
         else
-          fail ArgumentError, 'First element of an Array can only be String or Symbol.'
+          raise ArgumentError, 'First element of an Array can only be String or Symbol.'
         end
       when Hash # SQL
         code << '{' + conditions.collect { |key, value| key.to_s + ': ' + sanitize_condition(value) }.join(',') + '}'
@@ -106,7 +106,7 @@ module ActiveList
       when String
         code << conditions.inspect
       else
-        fail ArgumentError, "Unsupported type for conditions: #{conditions.inspect}"
+        raise ArgumentError, "Unsupported type for conditions: #{conditions.inspect}"
       end
       code
     end

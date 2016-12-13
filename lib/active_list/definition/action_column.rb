@@ -4,9 +4,9 @@ module ActiveList
     class ActionColumn < AbstractColumn
       include ActiveList::Helpers
 
-      ID_PLACEHOLDER = '##IDS##'
+      ID_PLACEHOLDER = '##IDS##'.freeze
 
-      USE_MODES = [:none, :single, :many, :both]
+      USE_MODES = [:none, :single, :many, :both].freeze
 
       attr_reader :use_mode
 
@@ -14,7 +14,7 @@ module ActiveList
         super(table, name, options)
         @use_mode = (@options.delete(:on) || :single).to_sym
         unless USE_MODES.include?(@use_mode)
-          fail "Invalid use mode: #{@use_mode.inspect}"
+          raise "Invalid use mode: #{@use_mode.inspect}"
         end
         if @name.to_s == 'destroy' && !@options.key?(:method)
           @options[:method] = :delete
@@ -40,7 +40,7 @@ module ActiveList
       end
 
       def global?
-        self.use_none? || self.use_many?
+        use_none? || use_many?
       end
 
       def header_code
@@ -67,7 +67,7 @@ module ActiveList
         action = @name
         format = @options[:format] ? ", format: '#{@options[:format]}'" : ''
         if @options[:remote]
-          fail StandardError, 'Sure to use :remote ?'
+          raise StandardError, 'Sure to use :remote ?'
         # remote_options = @options.dup
         # remote_options['data-confirm'] = "#{@options[:confirm].inspect}.tl".c unless @options[:confirm].nil?
         # remote_options.delete :remote
@@ -81,10 +81,10 @@ module ActiveList
         # code += ")"
         elsif @options[:actions]
           unless use_single?
-            fail StandardError, 'Only compatible with single actions'
+            raise StandardError, 'Only compatible with single actions'
           end
           unless @options[:actions].is_a? Hash
-            fail StandardError, ':actions parameter have to be a Hash.'
+            raise StandardError, ':actions parameter have to be a Hash.'
           end
           cases = []
           for expected, url in @options[:actions]

@@ -7,13 +7,11 @@ module ActiveList
         super(table, name, options)
         @label_method = (options[:label_method] || @name).to_sym
         unless @sort_column = options[:sort]
-          if @table.model.columns_hash[@label_method.to_s]
-            @sort_column = @label_method
-          elsif @table.model.columns_hash[@name.to_s]
-            @sort_column = @name
-          else
-            @sort_column = nil
-          end
+          @sort_column = if @table.model.columns_hash[@label_method.to_s]
+                           @label_method
+                         elsif @table.model.columns_hash[@name.to_s]
+                           @name
+                         end
         end
         @computation_method = options[:on_select]
         @column = @table.model.columns_hash[@label_method.to_s]
@@ -22,15 +20,15 @@ module ActiveList
       # Code for rows
       def datum_code(record = 'record_of_the_death', child = false)
         code = ''
-        if child
-          if @options[:children].is_a?(FalseClass)
-            code = 'nil'
-          else
-            code = "#{record}.#{table.options[:children]}.#{@options[:children] || @label_method}"
-          end
-        else
-          code = "#{record}.#{@label_method}"
-        end
+        code = if child
+                 if @options[:children].is_a?(FalseClass)
+                   'nil'
+                 else
+                   "#{record}.#{table.options[:children]}.#{@options[:children] || @label_method}"
+                        end
+               else
+                 "#{record}.#{@label_method}"
+               end
         code.c
       end
 

@@ -17,7 +17,7 @@ module ActiveList
       end
 
       def send_data_code
-        fail NotImplementedError, "#{self.class.name}#format_data_code is not implemented."
+        raise NotImplementedError, "#{self.class.name}#format_data_code is not implemented."
       end
 
       def columns_headers(options = {})
@@ -37,11 +37,11 @@ module ActiveList
         record = options[:record] || 'record_of_the_death'
         for column in columns
           next unless column.is_a?(ActiveList::Definition::AbstractColumn)
-          if nature == :header
-            datum = column.header_code
-          else
-            datum = column.exporting_datum_code(record)
-          end
+          datum = if nature == :header
+                    column.header_code
+                  else
+                    column.exporting_datum_code(record)
+                  end
           array << (options[:encoding] ? datum + ".to_s.encode('#{options[:encoding]}', invalid: :replace, undef: :replace)" : datum)
         end
         array
