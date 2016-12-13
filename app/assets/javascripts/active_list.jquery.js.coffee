@@ -106,7 +106,7 @@ ActiveList = {}
       if currency_precision and currency_symbol
         magnitude = Math.pow(10, currency_precision)
         rounded = Math.round(total * magnitude) / magnitude
-        displayable_total = "#{rounded} #{currency_symbol}"
+        displayable_total = "#{rounded.toFixed(currency_precision)} #{currency_symbol}"
       list.find("#computation-results td[data-list-result-for=\"#{column}\"] #list-computation-result").html(displayable_total)
     for column in list.find("th[data-list-column-computation]")
       col_number = $(column).data('list-column-cells')
