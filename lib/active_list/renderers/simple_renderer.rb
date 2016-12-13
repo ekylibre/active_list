@@ -282,7 +282,7 @@ module ActiveList
         # Separator
         menu << "<li class=\"separator\"></li>"
         # Exports
-        for format, exporter in ActiveList.exporters
+        ActiveList.exporters.each do |format, exporter|
           menu << "<li class=\"export export-#{format}\">' + link_to(content_tag(:i) + h('list.export_as'.t(exported: :#{format}.t(scope: 'list.export.formats'))), params.merge(action: :#{generator.controller_method_name}, sort: #{var_name(:params)}[:sort], dir: #{var_name(:params)}[:dir], format: '#{format}')) + '</li>"
         end
         menu << '</ul></span>'
@@ -293,20 +293,17 @@ module ActiveList
       # and pagination management
       def header_code
         code = ''
-        if table.columns.any? { |column| column.is_a?(ActiveList::Definition::DataColumn) && column.options[:currency] }
-          code << "currency = Nomen::Currencies[#{generator.records_variable_name}.first.currency] if #{generator.records_variable_name}.any?\n"
-        end
         code << "'<thead><tr>"
         code << "<th class=\"list-selector\"></th>" if table.selectable?
-        for column in table.columns
+        table.columns.each do |column|
           next if column.is_a?(ActiveList::Definition::ActionColumn) && !column.use_single?
           code << "<th data-list-column=\"#{column.sort_id}\""
           code << " data-list-column-cells=\"#{column.short_id}\""
           code << " data-list-column-sort=\"'+(#{var_name(:params)}[:sort] != '#{column.sort_id}' ? 'asc' : #{var_name(:params)}[:dir] == 'asc' ? 'desc' : 'asc')+'\"" if column.sortable?
           code << " data-list-column-computation=\"#{column.computation_method}\"" if column.computable?
-          if column.is_a?(ActiveList::Definition::DataColumn) && column.options[:currency]
-            code << " data-list-column-currency-symbol=\"' + (currency ? currency.symbol : '') + '\""
-            code << " data-list-column-currency-precision=\"' + (currency ? currency.precision.to_s : '') + '\""
+          if table.selectable? && column.is_a?(ActiveList::Definition::DataColumn) && column.options[:currency] &&
+            code << " data-list-column-currency-symbol=\"' + (#{generator.records_variable_name}.any? ? Nomen::Currency.find(#{column.currency_for(generator.records_variable_name + '.first').inspect} || 'EUR').symbol.to_s : '') + '\""
+            code << " data-list-column-currency-precision=\"' + (#{generator.records_variable_name}.any? ? Nomen::Currency.find(#{column.currency_for(generator.records_variable_name + '.first').inspect} || 'EUR').precision.to_s : '') + '\""
           end
           code << " class=\"#{column_classes(column, true, true)}\""
           code << '>'

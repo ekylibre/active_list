@@ -19,12 +19,7 @@ module ActiveList
         elsif datatype == :date
           datum = "(#{datum}.nil? ? '' : #{datum}.l)"
         elsif datatype == :decimal && !noview
-          currency = nil
-          if currency = options[:currency]
-            currency = currency[:body] if currency.is_a?(Hash)
-            currency = :currency if currency.is_a?(TrueClass)
-            currency = "#{record}.#{currency}".c if currency.is_a?(Symbol)
-          end
+          currency = currency_for(record)
           datum = "(#{datum}.nil? ? '' : #{datum}.l(#{'currency: ' + currency.inspect if currency}))"
         elsif @name.to_s.match(/(^|\_)currency$/) && datatype == :string
           datum = "(Nomen::Currencies[#{datum}] ? Nomen::Currencies[#{datum}].human_name : '')"
@@ -45,6 +40,16 @@ module ActiveList
 
       def enumerize?
         false
+      end
+
+      def currency_for(record)
+        currency = options[:currency]
+        if currency
+          currency = currency[:body] if currency.is_a?(Hash)
+          currency = :currency if currency.is_a?(TrueClass)
+          currency = "#{record}.#{currency}".c if currency.is_a?(Symbol)
+        end
+        currency
       end
 
       def state_machine?
