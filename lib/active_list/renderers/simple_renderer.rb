@@ -236,8 +236,8 @@ module ActiveList
             value_code = "'&#160;&#8709;&#160;'.html_safe"
           end
           code << "content_tag(:td, :class => \"#{column_classes(column)}\","
-          code << " data: { \"list-column-header\": \"#{column.short_id}\","
-          code << " \"list-cell-value\": \"\#{#{column.datum_code(record, children_mode)}}\"" if column.computable?
+          code << " data: { \"list-column-header\": \"#{column.short_id}\""
+          code << ", \"list-cell-value\": \"\#{#{column.datum_code(record, children_mode)}}\"" if column.computable?
           code << " } ) do\n"
           code << value_code.dig
           code << "end +\n"
@@ -265,7 +265,7 @@ module ActiveList
           list = list.uniq.sort
           menu << '<li class="parent">'
           menu << "<a class=\"pages\"><i></i>' + h('list.items_per_page'.t) + '</a><ul>"
-          for n in list
+          list.each do |n|
             menu << "<li data-list-change-page-size=\"#{n}\" '+(#{var_name(:params)}[:per_page] == #{n} ? ' class=\"check\"' : '') + '><a><i></i>' + h('list.x_per_page'.t(count: #{n})) + '</a></li>"
           end
           menu << '</ul></li>'
