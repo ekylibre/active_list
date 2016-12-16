@@ -236,8 +236,8 @@ module ActiveList
             value_code = "'&#160;&#8709;&#160;'.html_safe"
           end
           code << "content_tag(:td, :class => \"#{column_classes(column)}\","
-          code << " data: { \"list-column-header\": \"#{column.short_id}\""
-          code << ", \"list-cell-value\": \"\#{#{column.datum_code(record, children_mode)}}\"" if column.computable?
+          code << " data: { 'list-column-header' => '#{column.short_id}'"
+          code << ", 'list-cell-value' => \"\#{#{column.datum_code(record, children_mode)}}\"" if column.computable?
           code << " } ) do\n"
           code << value_code.dig
           code << "end +\n"
