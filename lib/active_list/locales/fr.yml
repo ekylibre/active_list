@@ -1,6 +1,7 @@
 fr: &fr
   list:
     columns: "Colonnes"
+    selected: "##NUM## élément(s) selectionné(s)."
     results:
       sum: "Total"
       average: "Moyenne"

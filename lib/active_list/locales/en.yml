@@ -1,5 +1,7 @@
 en: &en
   list:
+    columns: "Columns"
+    selected: "##NUM## selected item(s)."
     results:
       sum: "Total"
       average: "Average"

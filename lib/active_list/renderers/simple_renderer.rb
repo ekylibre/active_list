@@ -294,7 +294,10 @@ module ActiveList
       def header_code
         code = ''
         code << "'<thead><tr>"
-        code << '<th class="list-selector"></th>' if table.selectable?
+        if table.selectable?
+          code << '<th class="list-selector"><input type="checkbox" data-list-selector="all" /></th>'
+          disclaimer = '<caption>\'+ "list.selected".t + \'</caption>'
+        end
         table.columns.each do |column|
           next if column.is_a?(ActiveList::Definition::ActionColumn) && !column.use_single?
           code << "<th data-list-column=\"#{column.sort_id}\""
@@ -312,7 +315,9 @@ module ActiveList
           code << '</th>'
         end
         # code << "<th class=\"spe\">#{menu_code}</th>"
-        code << "</tr></thead>'"
+        code << '</tr></thead>'
+        code << (disclaimer || '')
+        code << "'"
         code
       end
 

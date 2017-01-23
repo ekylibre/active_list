@@ -119,11 +119,16 @@ ActiveList = {}
     selection = list.prop('selection')
     list_id = list.attr('id')
     actions = $("*[data-list-ref='#{list_id}']")
-    if Object.keys(selection).length > 0
+    caption = $(list).find("caption")
+    length = Object.keys(selection).length
+    caption.text(caption.text().replace(new RegExp('(##NUM##|\\d+)'), length))
+    if length > 0
+      caption.show()
       actions.find("*[data-list-actioner='none']:visible").hide()
       actions.find("*[data-list-actioner='none']:visible").hide()
       actions.find("*[data-list-actioner='many']:hidden").show()
     else
+      caption.hide()
       actions.find("*[data-list-actioner='none']:hidden").show()
       actions.find("*[data-list-actioner='many']:visible").hide()
     actions.find("*[data-list-actioner='many']").each (index) ->
@@ -142,6 +147,9 @@ ActiveList = {}
       page: page
     false
 
+  $(document).on "load", "*[data-list-source]", (event) ->
+    AL.refresh $(this)
+
   # Sort by one column
   $(document).on "click", "*[data-list-source] th[data-list-column][data-list-column-sort]", (event) ->
     sorter = $(this)
@@ -151,9 +159,8 @@ ActiveList = {}
       dir:  sorter.data("list-column-sort")
     false
 
-
   # Select row
-  $(document).on "click", "*[data-list-source] input[data-list-selector]", (event) ->
+  $(document).on "click", "*[data-list-source] td>input[data-list-selector]", (event) ->
     AL.select $(this)
     true
 
@@ -164,7 +171,6 @@ ActiveList = {}
     element.attr "title", element.html() unless title?
     return
 
-
   # Change number of item per page
   $(document).on "click", "*[data-list-ref] *[data-list-change-page-size]", (event) ->
     sizer = $(this)
@@ -173,6 +179,9 @@ ActiveList = {}
       console.error "@list-change-page-size attribute is not a number: #{per_page}"
     else
       list = $("##{sizer.closest('*[data-list-ref]').data('list-ref')}")
+      list.prop('selection', {})
+      AL.updateResults list
+      AL.checkGlobalButtons list
       AL.refresh list,
         per_page: per_page
     false
@@ -206,6 +215,11 @@ ActiveList = {}
         visibility: visibility
         column: columnId
     false
+
+  $(document).on "change", "input[data-list-selector=all]", (event) ->
+    check = $(this).is(':checked')
+    $(this).closest("table").find("td > input[data-list-selector]:not(:checked)").click() if check
+    $(this).closest("table").find("td > input[data-list-selector]:checked").click() unless check
 
   # Change page of table on link clicks
   $(document).on "click", "*[data-list-ref] a[data-list-move-to-page]", (event) ->
