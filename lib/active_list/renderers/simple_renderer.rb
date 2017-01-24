@@ -296,7 +296,7 @@ module ActiveList
         code << "'<thead><tr>"
         if table.selectable?
           code << '<th class="list-selector"><input type="checkbox" data-list-selector="all" /></th>'
-          disclaimer = '<caption>\'+ "list.selected".t + \'</caption>'
+          disclaimer = '<tr class="selected-count" style="display: none;"><th colspan="1000">\'+ "list.selected".t + \'</th></tr>'
         end
         table.columns.each do |column|
           next if column.is_a?(ActiveList::Definition::ActionColumn) && !column.use_single?
@@ -315,9 +315,9 @@ module ActiveList
           code << '</th>'
         end
         # code << "<th class=\"spe\">#{menu_code}</th>"
-        code << '</tr></thead>'
+        code << '</tr>'
         code << (disclaimer || '')
-        code << "'"
+        code << "</thead>'"
         code
       end
 

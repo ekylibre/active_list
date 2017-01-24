@@ -119,16 +119,18 @@ ActiveList = {}
     selection = list.prop('selection')
     list_id = list.attr('id')
     actions = $("*[data-list-ref='#{list_id}']")
-    caption = $(list).find("caption")
+    caption = $(list).find("tr.selected-count th")
     length = Object.keys(selection).length
+    console.log("HELLO")
     caption.text(caption.text().replace(new RegExp('(##NUM##|\\d+)'), length))
+    console.log "#{length}"
     if length > 0
-      caption.show()
+      caption.parent().show()
       actions.find("*[data-list-actioner='none']:visible").hide()
       actions.find("*[data-list-actioner='none']:visible").hide()
       actions.find("*[data-list-actioner='many']:hidden").show()
     else
-      caption.hide()
+      caption.parent().hide()
       actions.find("*[data-list-actioner='none']:hidden").show()
       actions.find("*[data-list-actioner='many']:visible").hide()
     actions.find("*[data-list-actioner='many']").each (index) ->
@@ -146,9 +148,6 @@ ActiveList = {}
     AL.refresh list,
       page: page
     false
-
-  $(document).on "load", "*[data-list-source]", (event) ->
-    AL.refresh $(this)
 
   # Sort by one column
   $(document).on "click", "*[data-list-source] th[data-list-column][data-list-column-sort]", (event) ->
