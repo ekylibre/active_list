@@ -1,4 +1,5 @@
 # coding: utf-8
+
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'active_list/version'
@@ -19,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
   spec.required_ruby_version = '>= 1.9.3'
 
-  spec.add_dependency 'rails', ['>= 3.2', '< 5.0.0']
+  spec.add_dependency 'rails', ['>= 3.2', '< 5.1.0']
   spec.add_dependency 'arel', ['>= 5.0.0']
   spec.add_dependency 'code_string', ['>= 0.0.0']
   spec.add_dependency 'rubyzip', ['>= 1.0']
