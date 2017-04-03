@@ -138,7 +138,7 @@ module ActiveList
 
       def columns_to_cells(nature, options = {})
         code = ''
-        unless %i(body children).include?(nature)
+        unless [:body, :children].include?(nature)
           raise ArgumentError, 'Nature is invalid'
         end
         record = options[:record] || 'record_of_the_death'
@@ -148,7 +148,7 @@ module ActiveList
           code << "end +\n"
         end
 
-        children_mode = !nature != :children
+        children_mode = !!(nature == :children)
         for column in table.columns
           value_code = ''
           if column.is_a? ActiveList::Definition::EmptyColumn
@@ -170,7 +170,7 @@ module ActiveList
               value_code = column.datum_code(record, children_mode)
               if column.datatype == :boolean
                 value_code = "content_tag(:div, '', :class => 'checkbox-'+(" + value_code.to_s + " ? 'true' : 'false'))"
-              elsif %i(date datetime timestamp measure).include? column.datatype
+              elsif [:date, :datetime, :timestamp, :measure].include? column.datatype
                 value_code = "(#{value_code}.nil? ? '' : #{value_code}.l)"
               elsif [:item].include? column.datatype
                 value_code = "(#{value_code}.nil? ? '' : #{value_code}.human_name)"
@@ -401,7 +401,7 @@ module ActiveList
           classes << :col
           classes << DATATYPE_ABBREVIATION[column.datatype]
           classes << :url if column.options[:url].is_a?(Hash)
-          classes << column.label_method if %i(code color).include? column.label_method.to_sym
+          classes << column.label_method if [:code, :color].include? column.label_method.to_sym
           if column.options[:mode] == :download
             classes << :dld
           elsif column.options[:mode] || column.label_method == :email

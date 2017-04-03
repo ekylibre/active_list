@@ -1,7 +1,7 @@
 module ActiveList
   module Definition
     class DataColumn < AbstractColumn
-      LABELS_COLUMNS = %i(full_name label name number coordinate).freeze
+      LABELS_COLUMNS = [:full_name, :label, :name, :number, :coordinate].freeze
 
       def header_code
         if @options[:label]
@@ -22,11 +22,11 @@ module ActiveList
           currency = currency_for(record)
           datum = "(#{datum}.nil? ? '' : #{datum}.l(#{'currency: ' + currency.inspect if currency}))"
         elsif @name.to_s.match(/(^|\_)currency$/) && datatype == :string
-          datum = "(Nomen::Currencies[#{datum}] ? Nomen::Currency.find(#{datum}).human_name : '')"
+          datum = "(Nomen::Currencies[#{datum}] ? Nomen::Currencies[#{datum}].human_name : '')"
         elsif @name.to_s.match(/(^|\_)country$/) && datatype == :string
-          datum = "(Nomen::Countries[#{datum}] ? Nomen::Country.find(#{datum}).human_name : '')"
+          datum = "(Nomen::Countries[#{datum}] ? Nomen::Countries[#{datum}].human_name : '')"
         elsif @name.to_s.match(/(^|\_)language$/) && datatype == :string
-          datum = "(Nomen::Languages[#{datum}] ? Nomen::Language.find(#{datum}).human_name : '')"
+          datum = "(Nomen::Languages[#{datum}] ? Nomen::Languages[#{datum}].human_name : '')"
         elsif enumerize?
           datum = "(#{datum}.nil? ? '' : #{datum}.text)"
         end
@@ -57,7 +57,7 @@ module ActiveList
       end
 
       def numeric?
-        %i(decimal integer float numeric).include? datatype
+        [:decimal, :integer, :float, :numeric].include? datatype
       end
 
       # Returns the size/length of the column if the column is in the database

@@ -1,5 +1,4 @@
 # coding: utf-8
-
 module ActiveList
   module Definition
     class ActionColumn < AbstractColumn
@@ -7,7 +6,7 @@ module ActiveList
 
       ID_PLACEHOLDER = '##IDS##'.freeze
 
-      USE_MODES = %i(none single many both).freeze
+      USE_MODES = [:none, :single, :many, :both].freeze
 
       attr_reader :use_mode
 

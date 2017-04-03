@@ -139,9 +139,9 @@ module ActiveList
           if reflections.size == 1
             reflection = reflections.first
             columns = reflection.class_name.constantize.columns.collect { |c| c.name.to_s }
-            column(%i(label name code number).detect { |l| columns.include?(l.to_s) }, through: reflection.name, url: true)
+            self.column([:label, :name, :code, :number].detect { |l| columns.include?(l.to_s) }, through: reflection.name, url: true)
           else
-            column(column.name.to_sym)
+            self.column(column.name.to_sym)
           end
         end
         true

@@ -46,8 +46,10 @@ module ActiveList
       end
 
       def enumerize?
-        table.model.respond_to?(:enumerized_attributes) &&
-          !table.model.enumerized_attributes[@label_method].nil?
+        table.model.send(@label_method).send(:values)
+        return true
+      rescue
+        return false
       end
 
       def sort_expression

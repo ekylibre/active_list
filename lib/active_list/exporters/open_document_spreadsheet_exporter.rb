@@ -1,5 +1,4 @@
 # encoding: UTF-8
-
 require 'zip'
 
 # Register ODS format unless is already set
