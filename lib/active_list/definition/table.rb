@@ -55,7 +55,7 @@ module ActiveList
       end
 
       def selectable?
-        @options[:selectable] || action_columns.select(&:use_many?).any?
+        @options[:selectable] || action_columns.select(&:use_many?).any? || data_columns.any?(&:computable?)
       end
 
       # Retrieves all columns in database
