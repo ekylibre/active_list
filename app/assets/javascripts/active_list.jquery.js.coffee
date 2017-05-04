@@ -101,12 +101,12 @@ ActiveList = {}
       total = values.reduce (t, s) -> t + s
       total /= values.length if AL.computation_for(list, column) == 'average'
       list.attr("data-list-result-#{column}", total)
-      currency_precision = parseInt(AL.column_for(list, column).data('list-column-currency-precision'))
-      currency_symbol    = AL.column_for(list, column).data('list-column-currency-symbol')
-      if currency_precision and currency_symbol
-        magnitude = Math.pow(10, currency_precision)
+      unit_precision = parseInt(AL.column_for(list, column).data('list-column-unit-precision'))
+      unit_symbol    = AL.column_for(list, column).data('list-column-unit-symbol')
+      if unit_precision and unit_symbol
+        magnitude = Math.pow(10, unit_precision)
         rounded = Math.round(total * magnitude) / magnitude
-        displayable_total = "#{rounded.toFixed(currency_precision)} #{currency_symbol}"
+        displayable_total = "#{rounded.toFixed(unit_precision)} #{unit_symbol}"
       list.find("#computation-results td[data-list-result-for=\"#{column}\"] #list-computation-result").html(displayable_total)
     for column in list.find("th[data-list-column-computation]")
       col_number = $(column).data('list-column-cells')

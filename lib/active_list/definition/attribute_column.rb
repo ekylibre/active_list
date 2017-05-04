@@ -1,11 +1,16 @@
 module ActiveList
   module Definition
     class AttributeColumn < DataColumn
-      attr_reader :column, :label_method, :sort_column, :computation_method
+      attr_reader :column, :value_method, :label_method, :sort_column, :computation_method
 
       def initialize(table, name, options = {})
         super(table, name, options)
         @label_method = (options[:label_method] || @name).to_sym
+        if options[:value_method].present?
+          @value_method = options[:value_method].to_sym
+        else
+          @value_method = @label_method.to_s.gsub('human_', '').to_sym
+        end
         unless @sort_column = options[:sort]
           @sort_column = if @table.model.columns_hash[@label_method.to_s]
                            @label_method
@@ -25,9 +30,23 @@ module ActiveList
                    'nil'
                  else
                    "#{record}.#{table.options[:children]}.#{@options[:children] || @label_method}"
-                        end
+                 end
                else
                  "#{record}.#{@label_method}"
+               end
+        code.c
+      end
+
+      def datum_value(record = 'record of the death', child = false)
+        code = ''
+        code = if child
+                 if @options[:childer].is_a?(FalseClass)
+                   'nil'
+                 else
+                   "#{record}.#{table.options[:children]}.#{@options[:children] || @value_method}"
+                 end
+               else
+                 "#{record}.#{@value_method}"
                end
         code.c
       end

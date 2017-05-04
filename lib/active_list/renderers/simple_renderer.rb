@@ -237,7 +237,7 @@ module ActiveList
           end
           code << "content_tag(:td, :class => \"#{column_classes(column)}\","
           code << " data: { 'list-column-header' => '#{column.short_id}'"
-          code << ", 'list-cell-value' => \"\#{#{column.datum_code(record, children_mode)}}\"" if column.computable?
+          code << ", 'list-cell-value' => \"\#{#{column.datum_value(record, children_mode)}.to_f}\"" if column.computable?
           code << " } ) do\n"
           code << value_code.dig
           code << "end +\n"
@@ -304,9 +304,18 @@ module ActiveList
           code << " data-list-column-cells=\"#{column.short_id}\""
           code << " data-list-column-sort=\"'+(#{var_name(:params)}[:sort] != '#{column.sort_id}' ? 'asc' : #{var_name(:params)}[:dir] == 'asc' ? 'desc' : 'asc')+'\"" if column.sortable?
           code << " data-list-column-computation=\"#{column.computation_method}\"" if column.computable?
-          if table.selectable? && column.is_a?(ActiveList::Definition::DataColumn) && column.options[:currency] &&
-             code << " data-list-column-currency-symbol=\"' + (#{generator.records_variable_name}.any? ? Nomen::Currency.find(#{column.currency_for(generator.records_variable_name + '.first').inspect} || 'EUR').symbol.to_s : '') + '\""
-            code << " data-list-column-currency-precision=\"' + (#{generator.records_variable_name}.any? ? Nomen::Currency.find(#{column.currency_for(generator.records_variable_name + '.first').inspect} || 'EUR').precision.to_s : '') + '\""
+          if table.selectable? && column.is_a?(ActiveList::Definition::DataColumn) && (column.options[:currency] || column.computable?)
+            unit = "''"
+            precision = "''"
+            if column.options[:currency]
+              unit = "Nomen::Currency.find(#{column.currency_for(generator.records_variable_name + '.first').inspect} || 'EUR').symbol.to_s"
+              precision = "Nomen::Currency.find(#{column.currency_for(generator.records_variable_name + '.first').inspect} || 'EUR').precision.to_s" 
+            elsif column.computable?
+              unit = "#{generator.records_variable_name}.first.#{column.value_method}.symbol"
+              precision = "'2'"
+            end
+            code << " data-list-column-unit-symbol=\"' + (#{generator.records_variable_name}.any? ? #{unit} : '') + '\""
+            code << " data-list-column-unit-precision=\"' + (#{generator.records_variable_name}.any? ? #{precision} : '') + '\""
           end
           code << " class=\"#{column_classes(column, true, true)}\""
           code << '>'
