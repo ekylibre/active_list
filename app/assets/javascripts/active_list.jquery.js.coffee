@@ -67,7 +67,7 @@ ActiveList = {}
     $(cell).data('list-cell-value')
 
   # Select a row of "many" buttons
-  AL.select = (checkbox) ->
+  AL.select = (checkbox, update = true) ->
     list = checkbox.closest('*[data-list-source]')
     row = checkbox.closest('tr')
     selection = if list.prop('selection')? then list.prop('selection') else {}
@@ -80,9 +80,9 @@ ActiveList = {}
       delete selection[key] if present
       row.removeClass("selected")
     list.prop('selection', selection)
-
-    AL.updateResults list
-    AL.checkGlobalButtons list
+    if update
+      AL.updateResults list
+      AL.checkGlobalButtons list
 
   AL.updateResults = (list) ->
     results = {}
@@ -121,9 +121,7 @@ ActiveList = {}
     actions = $("*[data-list-ref='#{list_id}']")
     caption = $(list).find("tr.selected-count th")
     length = Object.keys(selection).length
-    console.log("HELLO")
     caption.text(caption.text().replace(new RegExp('(##NUM##|\\d+)'), length))
-    console.log "#{length}"
     if length > 0
       caption.parent().show()
       actions.find("*[data-list-actioner='none']:visible").hide()
@@ -217,8 +215,11 @@ ActiveList = {}
 
   $(document).on "change", "input[data-list-selector=all]", (event) ->
     check = $(this).is(':checked')
-    $(this).closest("table").find("td > input[data-list-selector]:not(:checked)").click() if check
-    $(this).closest("table").find("td > input[data-list-selector]:checked").click() unless check
+    $(this).closest("table").find("td > input[data-list-selector]").each ->
+      $(this).prop('checked', check).parents('tr').toggleClass('selected', check)
+      AL.select($(this), false)
+    AL.updateResults $(this).closest('*[data-list-source]')
+    AL.checkGlobalButtons $(this).closest('*[data-list-source]')
 
   # Change page of table on link clicks
   $(document).on "click", "*[data-list-ref] a[data-list-move-to-page]", (event) ->
