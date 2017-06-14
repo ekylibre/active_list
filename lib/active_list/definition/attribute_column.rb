@@ -6,11 +6,11 @@ module ActiveList
       def initialize(table, name, options = {})
         super(table, name, options)
         @label_method = (options[:label_method] || @name).to_sym
-        if options[:value_method].present?
-          @value_method = options[:value_method].to_sym
-        else
-          @value_method = @label_method.to_s.gsub('human_', '').to_sym
-        end
+        @value_method = if options[:value_method].present?
+                          options[:value_method].to_sym
+                        else
+                          @label_method.to_s.gsub('human_', '').to_sym
+                        end
         unless @sort_column = options[:sort]
           @sort_column = if @table.model.columns_hash[@label_method.to_s]
                            @label_method

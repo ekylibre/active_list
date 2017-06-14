@@ -36,7 +36,6 @@ module ActiveList
 
       def build_table_code
         record = 'r'
-        child  = 'c'
 
         # colgroup = columns_definition_code
         header = header_code
@@ -138,7 +137,7 @@ module ActiveList
 
       def columns_to_cells(nature, options = {})
         code = ''
-        unless [:body, :children].include?(nature)
+        unless %i[body children].include?(nature)
           raise ArgumentError, 'Nature is invalid'
         end
         record = options[:record] || 'record_of_the_death'
@@ -156,7 +155,7 @@ module ActiveList
           elsif column.is_a? ActiveList::Definition::StatusColumn
 
             value_code = column.datum_code(record, children_mode)
-            levels = %w(go caution stop)
+            levels = %w[go caution stop]
             lights = levels.collect do |light|
               "content_tag(:span, '', :class => #{light.inspect})"
             end.join(' + ')
@@ -170,7 +169,7 @@ module ActiveList
               value_code = column.datum_code(record, children_mode)
               if column.datatype == :boolean
                 value_code = "content_tag(:div, '', :class => 'checkbox-'+(" + value_code.to_s + " ? 'true' : 'false'))"
-              elsif [:date, :datetime, :timestamp, :measure].include? column.datatype
+              elsif %i[date datetime timestamp measure].include? column.datatype
                 value_code = "(#{value_code}.nil? ? '' : #{value_code}.l)"
               elsif [:item].include? column.datatype
                 value_code = "(#{value_code}.nil? ? '' : #{value_code}.human_name)"
@@ -309,7 +308,7 @@ module ActiveList
             precision = "''"
             if column.options[:currency]
               unit = "Nomen::Currency.find(#{column.currency_for(generator.records_variable_name + '.first').inspect} || 'EUR').symbol.to_s"
-              precision = "Nomen::Currency.find(#{column.currency_for(generator.records_variable_name + '.first').inspect} || 'EUR').precision.to_s" 
+              precision = "Nomen::Currency.find(#{column.currency_for(generator.records_variable_name + '.first').inspect} || 'EUR').precision.to_s"
             elsif column.computable?
               unit = "#{generator.records_variable_name}.first.#{column.value_method}.symbol"
               precision = "'2'"
@@ -362,9 +361,6 @@ module ActiveList
           pagination << '<span class="paginator">'
           pagination << "<a href=\"#\" data-list-move-to-page=\"' + (#{current_page} - 1).to_s + '\" class=\"btn previous-page\"' + (#{current_page} != 1 ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.previous') + '</a>"
 
-          x = '@@PAGE-NUMBER@@'
-          y = '@@PAGE-COUNT@@'
-
           pagination << "<a href=\"#\" data-list-move-to-page=\"' + (#{current_page} + 1).to_s + '\" class=\"btn next-page\"' + (#{current_page} != #{last_page} ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.next')+'</a>"
           pagination << '</span>'
 
@@ -373,13 +369,7 @@ module ActiveList
           code << "'#{pagination}'"
           codes[:pagination] = "'#{pagination}'"
         end
-        return codes
-
-        unless code.empty?
-          code = "content_tag(:div, (#{code.join(' + ')}).html_safe, class: 'list-control')"
-        end
-
-        code
+        codes
       end
 
       def uid
@@ -410,7 +400,7 @@ module ActiveList
           classes << :col
           classes << DATATYPE_ABBREVIATION[column.datatype]
           classes << :url if column.options[:url].is_a?(Hash)
-          classes << column.label_method if [:code, :color].include? column.label_method.to_sym
+          classes << column.label_method if %i[code color].include? column.label_method.to_sym
           if column.options[:mode] == :download
             classes << :dld
           elsif column.options[:mode] || column.label_method == :email

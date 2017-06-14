@@ -1,7 +1,7 @@
 module ActiveList
   module Definition
     class DataColumn < AbstractColumn
-      LABELS_COLUMNS = [:full_name, :label, :name, :number, :coordinate].freeze
+      LABELS_COLUMNS = %i[full_name label name number coordinate].freeze
 
       def header_code
         if @options[:label]
@@ -57,7 +57,7 @@ module ActiveList
       end
 
       def numeric?
-        [:decimal, :integer, :float, :numeric].include? datatype
+        %i[decimal integer float numeric].include? datatype
       end
 
       # Returns the size/length of the column if the column is in the database
