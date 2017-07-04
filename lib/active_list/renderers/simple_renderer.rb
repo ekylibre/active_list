@@ -200,11 +200,11 @@ module ActiveList
               elsif column.label_method == :color
                 value_code = "content_tag(:div, #{column.datum_code(record)}, style: 'background: #'+" + column.datum_code(record) + ')'
               elsif column.label_method.to_s.match(/(^|\_)currency$/) && column.datatype == :string
-                value_code = "(Nomen::Currencies[#{value_code}] ? Nomen::Currencies[#{value_code}].human_name : #{value_code})"
+                value_code = "(Nomen::Currency[#{value_code}] ? Nomen::Currency[#{value_code}].human_name : #{value_code})"
               elsif column.label_method.to_s.match(/(^|\_)language$/) && column.datatype == :string
-                value_code = "(Nomen::Languages[#{value_code}]  ? Nomen::Languages[#{value_code}].human_name : #{value_code})"
+                value_code = "(Nomen::Language[#{value_code}]  ? Nomen::Language[#{value_code}].human_name : #{value_code})"
               elsif column.label_method.to_s.match(/(^|\_)country$/) && column.datatype == :string
-                value_code = "(Nomen::Countries[#{value_code}]  ? (image_tag('countries/' + #{value_code}.to_s + '.png') + ' ' + Nomen::Countries[#{value_code}].human_name).html_safe : #{value_code})"
+                value_code = "(Nomen::Country[#{value_code}]  ? (image_tag('countries/' + #{value_code}.to_s + '.png') + ' ' + Nomen::Country[#{value_code}].human_name).html_safe : #{value_code})"
               else # if column.datatype == :string
                 value_code = "h(#{value_code}.to_s)"
               end
