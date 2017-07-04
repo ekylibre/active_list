@@ -1,3 +1,3 @@
 module ActiveList
-  VERSION = '6.9.2'.freeze
+  VERSION = '6.9.3'.freeze
 end
