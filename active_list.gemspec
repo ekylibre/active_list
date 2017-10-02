@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
   spec.required_ruby_version = '>= 1.9.3'
 
-  spec.add_dependency 'rails', ['>= 3.2', '< 5.0.0']
+  spec.add_dependency 'rails', ['>= 3.2', '< 6.0.0']
   spec.add_dependency 'arel', ['>= 5.0.0']
   spec.add_dependency 'code_string', ['>= 0.0.1']
   spec.add_dependency 'rubyzip', ['>= 1.0']
