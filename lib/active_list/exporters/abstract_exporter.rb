@@ -13,7 +13,7 @@ module ActiveList
       end
 
       def mime_type
-        Mime::TEXT
+        Mime[:text]
       end
 
       def send_data_code

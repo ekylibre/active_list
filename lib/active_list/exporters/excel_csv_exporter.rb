@@ -1,5 +1,5 @@
 # Register XCSV format unless is already set
-Mime::Type.register('text/csv', :xcsv) unless defined? Mime::XCSV
+Mime::Type.register('text/csv', :xcsv) unless Mime[:xcsv]
 
 module ActiveList
   module Exporters
@@ -9,7 +9,7 @@ module ActiveList
       end
 
       def mime_type
-        Mime::XCSV
+        Mime[:xcsv]
       end
 
       def send_data_code
