@@ -1,5 +1,3 @@
-# coding: utf-8
-
 module ActiveList
   module Definition
     class ActionColumn < AbstractColumn
