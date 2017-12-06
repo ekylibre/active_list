@@ -1,4 +1,4 @@
 rvm:
   - 2.2.7
-before_script: "cd tmp/dummy && bundle install && bundle exec rake db:drop db:create db:migrate db:seed RAILS_ENV=test"
+before_script: "cd test/dummy && bundle install && bundle exec rake db:drop db:create db:migrate db:seed RAILS_ENV=test"
 script: "bundle exec rake test"
