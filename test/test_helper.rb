@@ -1,3 +1,4 @@
+# coding: utf-8
 require 'bundler/setup'
 require 'pathname'
 
@@ -8,7 +9,7 @@ require 'active_list'
 dummy_path = Pathname.new(__FILE__).dirname.join('dummy')
 
 ENV['BUNDLE_GEMFILE'] = ''
-Kernel.system("cd #{dummy_path} && bundle install && bundle exec rake db:drop db:create db:migrate db:seed RAILS_ENV=test")
+# Kernel.system("cd #{dummy_path} && bundle install && bundle exec rake db:drop db:create db:migrate db:seed RAILS_ENV=test")
 
 # CURRENT FILE :: test/test_helper.rb
 # Configure Rails Environment
