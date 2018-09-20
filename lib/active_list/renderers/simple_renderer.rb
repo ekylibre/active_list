@@ -179,7 +179,7 @@ module ActiveList
                 currency = :currency if currency.is_a?(TrueClass)
                 # currency = "#{record}.#{currency}".c if currency.is_a?(Symbol)
                 currency = "#{column.record_expr(record)}.#{currency}".c if currency.is_a?(Symbol)
-                value_code = "(#{value_code}.nil? ? '' : #{value_code}.l(currency: #{currency.inspect}))"
+                value_code = "(#{value_code}.nil? || #{value_code}.zero? ? ('#{column.options[:default]}'.present? ? '#{column.options[:default]}' : '') : #{value_code}.l(currency: #{currency.inspect}))"
               elsif column.datatype == :decimal
                 value_code = "(#{value_code}.nil? ? '' : #{value_code}.l)"
               elsif column.enumerize?
