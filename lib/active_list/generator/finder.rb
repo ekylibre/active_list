@@ -26,8 +26,15 @@ module ActiveList
       end
 
       code = ''
-      code << "#{var_name(:count)} = #{query_code}.count\n"
+      code << "#{query_code}\n"
 
+      code << if @table.options[:count].present?
+                "#{var_name(:count)} = #{query_code}.count(#{@table.options[:count].inspect})\n"
+              else
+                "#{var_name(:count)} = #{query_code}.count\n"
+              end
+
+      query_code << ".group(#{@table.options[:group].inspect})" unless @table.options[:group].blank?
       query_code << ".reorder(#{var_name(:order)})"
 
       if paginate
