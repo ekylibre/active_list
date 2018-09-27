@@ -17,6 +17,7 @@ module ActiveList
       query_code = class_name.to_s
       query_code << scope_code if scope_code
       query_code << ".select(#{select_code})" if select_code
+      query_code << ".from(#{from_code})" if from_code
       query_code << ".where(#{conditions_code})" unless @table.options[:conditions].blank?
       query_code << ".joins(#{@table.options[:joins].inspect})" unless @table.options[:joins].blank?
       unless includes_reflections.empty?
@@ -115,6 +116,14 @@ module ActiveList
       else
         raise ArgumentError, "Unsupported type for conditions: #{conditions.inspect}"
       end
+      code
+    end
+
+    def from_code
+      return nil unless @table.options[:from]
+      from = @table.options[:from]
+      code = ''
+      code << '(' + from.gsub(/\s*\n\s*/, ';') + ')'
       code
     end
 
