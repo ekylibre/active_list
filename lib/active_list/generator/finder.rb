@@ -17,6 +17,7 @@ module ActiveList
       query_code = class_name.to_s
       query_code << scope_code if scope_code
       query_code << ".select(#{select_code})" if select_code
+      query_code << ".from(#{from_code})" if from_code
       query_code << ".where(#{conditions_code})" unless @table.options[:conditions].blank?
       query_code << ".joins(#{@table.options[:joins].inspect})" unless @table.options[:joins].blank?
       unless includes_reflections.empty?
@@ -26,8 +27,15 @@ module ActiveList
       end
 
       code = ''
-      code << "#{var_name(:count)} = #{query_code}.count\n"
+      code << "#{query_code}\n"
 
+      code << if @table.options[:count].present?
+                "#{var_name(:count)} = #{query_code}.count(#{@table.options[:count].inspect})\n"
+              else
+                "#{var_name(:count)} = #{query_code}.count\n"
+              end
+
+      query_code << ".group(#{@table.options[:group].inspect})" unless @table.options[:group].blank?
       query_code << ".reorder(#{var_name(:order)})"
 
       if paginate
@@ -111,13 +119,31 @@ module ActiveList
       code
     end
 
+    def from_code
+      return nil unless @table.options[:from]
+      from = @table.options[:from]
+      code = ''
+      code << '(' + from.gsub(/\s*\n\s*/, ';') + ')'
+      code
+    end
+
     def select_code
       return nil unless @table.options[:distinct] || @table.options[:select]
       code = ''
       code << 'DISTINCT ' if @table.options[:distinct]
-      code << "#{@table.model.table_name}.*"
       if @table.options[:select]
-        code << @table.options[:select].collect { |k, v| ", #{k[0].to_s + '.' + k[1].to_s} AS #{v}" }.join
+        # code << @table.options[:select].collect { |k, v| ", #{k[0].to_s + '.' + k[1].to_s} AS #{v}" }.join
+        code << @table.options[:select].collect do |k, v| 
+          c = if k.is_a? Array
+                k[0].to_s + '.' + k[1].to_s
+              else
+                k
+              end
+          c += " AS #{v}" unless v.blank?
+          c
+        end.join(', ')
+      else
+        code << "#{@table.model.table_name}.*"
       end
       ("'" + code + "'").c
     end
