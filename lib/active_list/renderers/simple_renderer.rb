@@ -107,6 +107,7 @@ module ActiveList
           code << "options[:content_for] ||= {}\n"
           code << "#{var_name(:extras)} = ''\n"
           extras.each do |name, ecode|
+            next if name == :footer_pagination
             code << "if options[:content_for][:#{name}]\n"
             code << "  content_for(options[:content_for][:#{name}], (#{ecode}).html_safe)\n"
             code << "else\n"
@@ -127,6 +128,17 @@ module ActiveList
         code << "end\n"
         code << "#{var_name(:content)} << #{var_name(:tbody)}\n"
         code << "#{var_name(:content)} << '</table></div>'\n"
+
+        if table.options[:footer_pagination]
+          code << "  footer_code = ''\n"
+          code << "  if options[:content_for][:footer_pagination]\n"
+          code << "    footer_code << content_for(options[:content_for][:pagination])\n"
+          code << "  else\n"
+          code << "    footer_code << (#{extras[:footer_pagination]})\n"
+          code << "  end\n"
+          code << "  #{var_name(:content)} << content_tag(:div, (footer_code).html_safe, class: 'list-control') unless footer_code.blank?\n"
+        end
+
         # code << "return #{var_name(:content)}.html_safe if options[:only] == 'content'\n"
 
         # Build whole
@@ -368,6 +380,26 @@ module ActiveList
 
           code << "'#{pagination}'"
           codes[:pagination] = "'#{pagination}'"
+
+          if table.options[:footer_pagination]
+            pagination = ''
+            current_page = var_name(:page).to_s
+            last_page = var_name(:last).to_s
+
+            pagination << "<span class=\"list-footer-pagination\" data-list-ref=\"#{uid}\">"
+            pagination << "<span class=\"status\">' + 'list.pagination.x_to_y_of_total'.t(x: (#{var_name(:offset)} + (#{var_name(:count)} > 0 ? 1 : 0)), y: ((#{var_name(:last)} == #{var_name(:page)}) ? #{var_name(:count)} : #{var_name(:offset)} + #{var_name(:limit)}), total: #{var_name(:count)}) + '</span>"
+
+            pagination << '<span class="paginator">'
+            pagination << "<a href=\"#\" data-list-move-to-page=\"' + (#{current_page} - 1).to_s + '\" class=\"btn previous-page\"' + (#{current_page} != 1 ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.previous') + '</a>"
+
+            pagination << "<a href=\"#\" data-list-move-to-page=\"' + (#{current_page} + 1).to_s + '\" class=\"btn next-page\"' + (#{current_page} != #{last_page} ? '' : ' disabled=\"true\"') + '><i></i>' + ::I18n.translate('list.pagination.next')+'</a>"
+            pagination << '</span>'
+
+            pagination << '</span>'
+
+            code << "'#{pagination}'"
+            codes[:footer_pagination] = "'#{pagination}'"
+          end
         end
         codes
       end
