@@ -70,7 +70,7 @@ module ActiveList
       code = "# encoding: utf-8\n"
       code << "def #{view_method_name}(options={}, &block)\n"
       code << session_initialization_code.dig
-      code << renderer.build_table_code.dig
+      code <<   "#{renderer.build_table_code}(options).dig\n"
       code << "end\n"
       # code.split("\n").each_with_index{|l, x| puts((x+1).to_s.rjust(4)+": "+l)}
       unless ::Rails.env.production?
