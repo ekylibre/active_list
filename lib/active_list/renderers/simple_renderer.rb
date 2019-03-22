@@ -34,7 +34,7 @@ module ActiveList
         code
       end
 
-      def build_table_code
+      def build_table_code(options = {})
         record = 'r'
 
         # colgroup = columns_definition_code
@@ -51,6 +51,7 @@ module ActiveList
         code << "if #{var_name(:count)} > 0\n"
         code << "  #{generator.records_variable_name}.each do |#{record}|\n"
         code << "    #{var_name(:attrs)} = {id: 'r' + #{record}.id.to_s}\n"
+        code << "    #{var_name(:attrs)}['data-' + options[:data].gsub('_', '-')] = #{record}.send(options[:data]) if options[:data]\n"
         if table.options[:line_class]
           code << "    #{var_name(:attrs)}[:class] = (#{recordify!(table.options[:line_class], record)}).to_s\n"
           code << "    #{var_name(:attrs)}[:class] << ' focus' if params['#{table.name}-id'].to_i == #{record}.id\n"
