@@ -42,6 +42,8 @@ module ActiveList
         extras = extras_codes
 
         code = generator.select_data_code
+        # Hack for Rails 5
+        code << "params.instance_variable_set :@permitted, true\n"
         code << "#{var_name(:tbody)} = '<tbody data-total=\"' + #{var_name(:count)}.to_s + '\""
         if table.paginate?
           code << " data-per-page=\"' + #{var_name(:limit)}.to_s + '\""

@@ -9,7 +9,7 @@ module ActiveList
       end
 
       def mime_type
-        Mime::XCSV
+        Mime[:xcsv]
       end
 
       def send_data_code

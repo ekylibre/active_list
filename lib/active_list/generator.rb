@@ -83,7 +83,8 @@ module ActiveList
 
     def session_initialization_code
       code = "options = {} unless options.is_a? Hash\n"
-      code << "options.update(params)\n"
+      # For Rails 5
+      code << "options.update(params.to_unsafe_h)\n"
       if defined?(User) && User.instance_methods.include?(:preference)
         code << "#{var_name(:params)} = YAML::load(current_user.preference('list.#{view_method_name}', YAML::dump({})).value).symbolize_keys\n"
         code << "#{var_name(:params)} = {} unless #{var_name(:params)}.is_a?(Hash)\n"

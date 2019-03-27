@@ -4,6 +4,7 @@ require 'action_dispatch'
 require 'rails'
 require 'code_string'
 require 'i18n-complements'
+require 'tmpdir'
 
 module ActiveList
   # Build and returns a short UID
