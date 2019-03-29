@@ -6,7 +6,7 @@ module ActiveList
       end
 
       def mime_type
-        Mime::CSV
+        Mime[:csv]
       end
 
       def send_data_code

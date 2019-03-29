@@ -19,7 +19,7 @@ module ActiveList
       end
 
       def mime_type
-        Mime::ODS
+        Mime[:ods]
       end
 
       def send_data_code
