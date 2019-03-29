@@ -23,7 +23,7 @@ ActiveList = {}
         content = $(data)
         list_data = content.find(".list-data")
         list_control = content.find(".list-control")
-        for type in ["actions", "pagination", "settings"]
+        for type in ["actions", "pagination", "footer-pagination","settings"]
           $("*[data-list-ref='#{list_id}'].list-#{type}").replaceWith list_control.find(".list-#{type}")
         list.find(".list-data").html(list_data)
         selection = list.prop('selection')

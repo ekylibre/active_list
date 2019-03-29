@@ -78,7 +78,7 @@
     @include background(transparentize(mix($theme-color, #FFF, 40%), 0.7));
   }
 
-  .list-pagination {
+  .list-pagination, .list-footer-pagination {
     & { text-align: left; }
     html[dir="rtl"] & { text-align: right; }
     & > * {
