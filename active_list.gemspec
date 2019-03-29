@@ -23,5 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'code_string', ['>= 0.0.1']
   spec.add_dependency 'rubyzip', ['>= 1.0']
   spec.add_dependency 'i18n-complements', ['>= 0']
-  spec.add_development_dependency('sqlite3', ['>= 0'])
+  spec.add_development_dependency('sqlite3', ['~> 1.3.6'])
 end
