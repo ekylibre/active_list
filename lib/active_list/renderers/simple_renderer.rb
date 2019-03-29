@@ -43,7 +43,7 @@ module ActiveList
 
         code = generator.select_data_code
         # Hack for Rails 5
-        code << "params.instance_variable_set :@permitted, true\n"
+        code << "__params = params.permit!\n"
         code << "#{var_name(:tbody)} = '<tbody data-total=\"' + #{var_name(:count)}.to_s + '\""
         if table.paginate?
           code << " data-per-page=\"' + #{var_name(:limit)}.to_s + '\""
@@ -56,9 +56,9 @@ module ActiveList
         code << "    #{var_name(:attrs)}['data-' + options[:data].gsub('_', '-')] = #{record}.send(options[:data]) if options[:data]\n"
         if table.options[:line_class]
           code << "    #{var_name(:attrs)}[:class] = (#{recordify!(table.options[:line_class], record)}).to_s\n"
-          code << "    #{var_name(:attrs)}[:class] << ' focus' if params['#{table.name}-id'].to_i == #{record}.id\n"
+          code << "    #{var_name(:attrs)}[:class] << ' focus' if __params['#{table.name}-id'].to_i == #{record}.id\n"
         else
-          code << "    #{var_name(:attrs)}[:class] = 'focus' if params['#{table.name}-id'].to_i == #{record}.id\n"
+          code << "    #{var_name(:attrs)}[:class] = 'focus' if __params['#{table.name}-id'].to_i == #{record}.id\n"
         end
         code << "    #{var_name(:tbody)} << content_tag(:tr, #{var_name(:attrs)}) do\n"
         code << columns_to_cells(:body, record: record).dig(3)
@@ -133,7 +133,7 @@ module ActiveList
         # code << "return #{var_name(:content)}.html_safe if options[:only] == 'content'\n"
 
         # Build whole
-        code << "return ('<div id=\"#{uid}\" data-list-source=\"'+h(url_for(options.merge(:action => '#{generator.controller_method_name}')))+'\" data-list-redirect=\"' + params[:redirect].to_s + '\" class=\"active-list\">' + #{var_name(:content)} + '</div>').html_safe\n"
+        code << "return ('<div id=\"#{uid}\" data-list-source=\"'+h(url_for(options.merge(:action => '#{generator.controller_method_name}')))+'\" data-list-redirect=\"' + __params[:redirect].to_s + '\" class=\"active-list\">' + #{var_name(:content)} + '</div>').html_safe\n"
         # File.open('debug-activelist', 'w') { |file| file.write code }
         code
       end
@@ -285,7 +285,7 @@ module ActiveList
         menu << '<li class="separator"></li>'
         # Exports
         ActiveList.exporters.each do |format, _exporter|
-          menu << "<li class=\"export export-#{format}\">' + link_to(content_tag(:i) + h('list.export_as'.t(exported: :#{format}.t(scope: 'list.export.formats'))), params.merge(action: :#{generator.controller_method_name}, sort: #{var_name(:params)}[:sort], dir: #{var_name(:params)}[:dir], format: '#{format}')) + '</li>"
+          menu << "<li class=\"export export-#{format}\">' + link_to(content_tag(:i) + h('list.export_as'.t(exported: :#{format}.t(scope: 'list.export.formats'))), __params.merge(action: :#{generator.controller_method_name}, sort: #{var_name(:params)}[:sort], dir: #{var_name(:params)}[:dir], format: '#{format}')) + '</li>"
         end
         menu << '</ul></span>'
         menu
