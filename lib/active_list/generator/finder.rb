@@ -34,7 +34,6 @@ module ActiveList
               else
                 "#{var_name(:count)} = #{query_code}.count\n"
               end
-
       query_code << ".group(#{@table.options[:group].inspect})" unless @table.options[:group].blank?
       query_code << ".reorder(#{var_name(:order)})"
 
@@ -133,7 +132,7 @@ module ActiveList
       code << 'DISTINCT ' if @table.options[:distinct]
       if @table.options[:select]
         # code << @table.options[:select].collect { |k, v| ", #{k[0].to_s + '.' + k[1].to_s} AS #{v}" }.join
-        code << @table.options[:select].collect do |k, v| 
+        code << @table.options[:select].collect do |k, v|
           c = if k.is_a? Array
                 k[0].to_s + '.' + k[1].to_s
               else

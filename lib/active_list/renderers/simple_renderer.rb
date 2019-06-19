@@ -314,7 +314,7 @@ module ActiveList
         end
         table.columns.each do |column|
           next if column.is_a?(ActiveList::Definition::ActionColumn) && !column.use_single?
-          code << "<th data-list-column=\"#{column.sort_id}\""
+          code << "<th data-list-column=\"#{column.options[:icon_name] || column.sort_id}\""
           code << " data-list-column-cells=\"#{column.short_id}\""
           code << " data-list-column-sort=\"'+(#{var_name(:params)}[:sort] != '#{column.sort_id}' ? 'asc' : #{var_name(:params)}[:dir] == 'asc' ? 'desc' : 'asc')+'\"" if column.sortable?
           code << " data-list-column-computation=\"#{column.computation_method}\"" if column.computable?
