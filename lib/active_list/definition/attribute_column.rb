@@ -11,13 +11,7 @@ module ActiveList
                         else
                           @label_method.to_s.gsub('human_', '').to_sym
                         end
-        unless @sort_column = options[:sort]
-          @sort_column = if @table.model.columns_hash[@label_method.to_s]
-                           @label_method
-                         elsif @table.model.columns_hash[@name.to_s]
-                           @name
-                         end
-        end
+        @sort_column = get_sort_column
         @computation_method = options[:on_select]
         @column = @table.model.columns_hash[@label_method.to_s]
       end
@@ -51,6 +45,24 @@ module ActiveList
         code.c
       end
 
+      def get_sort_column
+        selects = @table.options[:select] || {}
+        selects_label = selects.find { |sql_name, name| name.to_s == @label_method.to_s }&.last
+        selects_name = selects.find { |sql_name, name| name.to_s == @name.to_s }&.last
+        if (selects_label || selects_name) && options[:sort].blank?
+          sort_column = (selects_label || selects_name)
+        else
+          sort_column = options[:sort]
+          sort_column ||= if @table.model.columns_hash[@label_method.to_s]
+                             @label_method
+                           elsif @table.model.columns_hash[@name.to_s]
+                             @name
+                           end
+          sort_column &&= "#{@table.model.table_name}.#{sort_column}"
+        end
+        sort_column
+      end
+
       # Returns the class name of the used model
       def class_name
         table.model.name
@@ -70,7 +82,7 @@ module ActiveList
       end
 
       def sort_expression
-        "#{@table.model.table_name}.#{@sort_column}"
+        @sort_column
       end
     end
   end
