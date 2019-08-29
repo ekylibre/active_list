@@ -65,7 +65,7 @@ module ActiveList
 
       # Returns the class name of the used model
       def class_name
-        table.model.name
+        "RECORD.class.name.tableize".c
       end
 
       def sortable?
