@@ -41,7 +41,7 @@ module ActiveList
         header = header_code
         extras = extras_codes
 
-        code = generator.select_data_code
+        code = "#{generator.select_data_code}(options)\n"
         # Hack for Rails 5
         code << "__params = params.permit!\n"
         code << "#{var_name(:tbody)} = '<tbody data-total=\"' + #{var_name(:count)}.to_s + '\""
@@ -53,7 +53,12 @@ module ActiveList
         code << "if #{var_name(:count)} > 0\n"
         code << "  #{generator.records_variable_name}.each do |#{record}|\n"
         code << "    #{var_name(:attrs)} = {id: 'r' + #{record}.id.to_s}\n"
-        code << "    #{var_name(:attrs)}['data-' + options[:data].gsub('_', '-')] = #{record}.send(options[:data]) if options[:data]\n"
+        code << " if #{var_name(:params)}[:data]\n"
+        code << "   #{var_name(:params)}[:data] = [#{var_name(:params)}[:data]] unless #{var_name(:params)}[:data].is_a?(Array)\n"
+        code << "   #{var_name(:params)}[:data].each do |attr|\n"
+        code << "     #{var_name(:attrs)}['data-' + attr.gsub('_', '-')] = #{record}.send(attr)\n"
+        code << "   end\n"
+        code << " end\n"
         if table.options[:line_class]
           code << "    #{var_name(:attrs)}[:class] = (#{recordify!(table.options[:line_class], record)}).to_s\n"
           code << "    #{var_name(:attrs)}[:class] << ' focus' if __params['#{table.name}-id'].to_i == #{record}.id\n"
@@ -165,17 +170,20 @@ module ActiveList
         children_mode = !!(nature == :children)
         for column in table.columns
           value_code = ''
+          title_value_code = ''
           if column.is_a? ActiveList::Definition::EmptyColumn
             value_code = 'nil'
           elsif column.is_a? ActiveList::Definition::StatusColumn
-
+            title_value_code = nil
             value_code = column.datum_code(record, children_mode)
+            title_code = column.tooltip_title_code(record, children_mode)
             levels = %w[go caution stop]
             lights = levels.collect do |light|
               "content_tag(:span, '', :class => #{light.inspect})"
             end.join(' + ')
             # Expected value are :valid, :warning, :error
-            value_code = "content_tag(:span, #{lights}, :class => 'lights lights-' + (#{levels.inspect}.include?(#{value_code}.to_s) ? #{value_code}.to_s : 'undefined'))"
+
+            value_code = "content_tag(:span, #{lights}, :class => 'lights lights-' + (#{levels.inspect}.include?(#{value_code}.to_s) ? #{value_code}.to_s : 'undefined'), data: { toggle: :tooltip, placement: :top }, title: #{title_code})"
 
           elsif column.is_a? ActiveList::Definition::DataColumn
             if column.options[:children].is_a?(FalseClass) && children_mode
@@ -183,6 +191,7 @@ module ActiveList
             else
               value_code = column.datum_code(record, children_mode)
               if column.datatype == :boolean
+                title_value_code = value_code
                 value_code = "content_tag(:div, '', :class => 'checkbox-'+(" + value_code.to_s + " ? 'true' : 'false'))"
               elsif %i[date datetime timestamp measure].include? column.datatype
                 value_code = "(#{value_code}.nil? ? '' : #{value_code}.l)"
@@ -204,29 +213,37 @@ module ActiveList
                 column.options[:url] = {} unless column.options[:url].is_a?(Hash)
                 column.options[:url][:id] ||= (column.record_expr(record) + '.id').c
                 column.options[:url][:action] ||= :show
-                column.options[:url][:controller] ||= column.class_name.tableize.to_sym # (self.generator.collection? ? "RECORD.class.name.tableize".c : column.class_name.tableize.to_sym)
-                # column.options[:url][:controller] ||= "#{value_code}.class.name.tableize".c
-                url = column.options[:url].collect { |k, v| "#{k}: " + urlify(v, record) }.join(', ')
+                default_controller = column.class_name.is_a?(CodeString) ? column.class_name : column.class_name.tableize.to_sym
+                column.options[:url][:controller] ||= default_controller
+                namespace = column.options[:url].delete(:namespace)
+                url = column.options[:url].collect { |k, v| "#{k}: " + urlify(k, v, record, namespace) }.join(', ')
+
+                title_value_code = value_code
                 value_code = "(#{value_code}.blank? ? '' : link_to(#{value_code}.to_s, #{url}))"
               elsif column.options[:mode] || column.label_method == :email
+                title_value_code = value_code
                 value_code = "(#{value_code}.blank? ? '' : mail_to(#{value_code}))"
               elsif column.options[:mode] || column.label_method == :website
+                title_value_code = value_code
                 value_code = "(#{value_code}.blank? ? '' : link_to(" + value_code + ', ' + value_code + '))'
               elsif column.label_method == :color
+                title_value_code = value_code
                 value_code = "content_tag(:div, #{column.datum_code(record)}, style: 'background: #'+" + column.datum_code(record) + ')'
               elsif column.label_method.to_s.match(/(^|\_)currency$/) && column.datatype == :string
-                value_code = "(Nomen::Currency[#{value_code}] ? Nomen::Currency[#{value_code}].human_name : #{value_code})"
+                value_code = "(Onoma::Currency[#{value_code}] ? Onoma::Currency[#{value_code}].human_name : #{value_code})"
               elsif column.label_method.to_s.match(/(^|\_)language$/) && column.datatype == :string
-                value_code = "(Nomen::Language[#{value_code}]  ? Nomen::Language[#{value_code}].human_name : #{value_code})"
+                value_code = "(Onoma::Language[#{value_code}]  ? Onoma::Language[#{value_code}].human_name : #{value_code})"
               elsif column.label_method.to_s.match(/(^|\_)country$/) && column.datatype == :string
-                value_code = "(Nomen::Country[#{value_code}]  ? (image_tag('countries/' + #{value_code}.to_s + '.png') + ' ' + Nomen::Country[#{value_code}].human_name).html_safe : #{value_code})"
+                value_code = "(Onoma::Country[#{value_code}]  ? (image_tag('countries/' + #{value_code}.to_s + '.png') + ' ' + Onoma::Country[#{value_code}].human_name).html_safe : #{value_code})"
               else # if column.datatype == :string
                 value_code = "h(#{value_code}.to_s)"
+                title_value_code = nil
               end
 
               value_code = "if #{record}\n#{value_code.dig}end" if column.is_a?(ActiveList::Definition::AssociationColumn)
             end
           elsif column.is_a?(ActiveList::Definition::CheckBoxColumn)
+            title_value_code = nil
             if nature == :body
               form_name = column.form_name || "'#{table.name}[' + #{record}.id.to_s + '][#{column.name}]'".c
               value = 'nil'
@@ -241,15 +258,29 @@ module ActiveList
               value_code << 'nil'
             end
           elsif column.is_a?(ActiveList::Definition::TextFieldColumn)
+            title_value_code = nil
             form_name = column.form_name || "'#{table.name}[' + #{record}.id.to_s + '][#{column.name}]'".c
             value_code = (nature == :body ? "text_field_tag(#{form_name.inspect}, #{recordify!(column.options[:value] || column.name, record)}#{column.options[:size] ? ', size: ' + column.options[:size].to_s : ''})" : 'nil') # , id: '#{table.name}_'+#{record}.id.to_s + '_#{column.name}'
+          elsif column.is_a?(ActiveList::Definition::IconColumn)
+            title_value_code = nil
+            value_code = column.icon_code(record)
           elsif column.is_a?(ActiveList::Definition::ActionColumn)
+            title_value_code = nil
             next unless column.use_single?
             value_code = (nature == :body ? column.operation(record) : 'nil')
           else
             value_code = "'&#160;&#8709;&#160;'.html_safe"
           end
-          code << "content_tag(:td, :class => \"#{column_classes(column)}\","
+
+          title_attr_code = if title_value_code.nil?
+                              ''
+                            elsif title_value_code.blank?
+                              ":title => (#{value_code}),"
+                            else
+                              ":title => (#{title_value_code}),"
+                            end
+
+          code << "content_tag(:td, #{title_attr_code} :class => \"#{column_classes(column)}\","
           code << " data: { 'list-column-header' => '#{column.short_id}'"
           code << ", 'list-cell-value' => \"\#{#{column.datum_value(record, children_mode)}.to_f}\"" if column.computable?
           code << " } ) do\n"
@@ -322,8 +353,8 @@ module ActiveList
             unit = "''"
             precision = "''"
             if column.options[:currency]
-              unit = "Nomen::Currency.find(#{column.currency_for(generator.records_variable_name + '.first').inspect} || 'EUR').symbol.to_s"
-              precision = "Nomen::Currency.find(#{column.currency_for(generator.records_variable_name + '.first').inspect} || 'EUR').precision.to_s"
+              unit = "Onoma::Currency.find(#{column.currency_for(generator.records_variable_name + '.first').inspect} || 'EUR').symbol.to_s"
+              precision = "Onoma::Currency.find(#{column.currency_for(generator.records_variable_name + '.first').inspect} || 'EUR').precision.to_s"
             elsif column.computable?
               unit = "#{generator.records_variable_name}.first.#{column.value_method}.symbol"
               precision = "'2'"
@@ -424,7 +455,11 @@ module ActiveList
         classes = []
         conds = []
         conds << [:sor, "#{var_name(:params)}[:sort] == '#{column.sort_id}'".c] if column.sortable?
-        conds << [:hidden, "#{var_name(:params)}[:hidden_columns].include?(:#{column.name})".c] if column.is_a? ActiveList::Definition::DataColumn
+        if column.is_a? ActiveList::Definition::DataColumn
+          conds << [:hidden, "#{var_name(:params)}[:hidden_columns].include?(:#{column.name})".c]
+        elsif column.condition
+          conds << [:hidden, "h(#{column.condition}) == 'false'".c]
+        end
         classes << column.options[:class].to_s.strip unless column.options[:class].blank?
         classes << column.short_id unless without_id
         if column.is_a? ActiveList::Definition::ActionColumn
@@ -447,6 +482,9 @@ module ActiveList
           classes << :tfd
         elsif column.is_a? ActiveList::Definition::CheckBoxColumn
           classes << :chk
+        elsif column.is_a? ActiveList::Definition::IconColumn
+          classes << :act
+          classes << "icon-#{column.name}"
         else
           classes << :unk
         end

@@ -20,11 +20,12 @@ module ActiveList
       end
     end
 
-    def urlify(value, record_name)
-      if value.is_a?(CodeString)
-        '(' + value.gsub(/RECORD/, record_name) + ')'
+    def urlify(key, value, record_name, namespace = nil)
+      return value.inspect unless value.is_a?(CodeString)
+      if key == :controller && namespace
+        '(' + "'/#{namespace}/' + " + value.gsub(/RECORD/, record_name) + ')'
       else
-        value.inspect
+        '(' + value.gsub(/RECORD/, record_name) + ')'
       end
     end
   end

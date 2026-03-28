@@ -41,7 +41,7 @@ end
 
 module ActionView
   class Base
-    module Nomen
+    module Onoma
       class Currencies
         def self.[](_)
           klass = Struct.const_defined?(:Currency) ? Struct::Currency : Struct.new('Currency', :precision, :symbol)

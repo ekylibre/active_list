@@ -1,13 +1,14 @@
 module ActiveList
   module Definition
     class AbstractColumn
-      attr_reader :table, :name, :id, :options
+      attr_reader :table, :name, :id, :options, :condition
 
       def initialize(table, name, options = {})
         @table   = table
         @name    = name.to_sym
         @options = options
         @hidden  = !!@options.delete(:hidden)
+        @condition = @options.delete(:condition)
         @id = 'c' + @table.new_column_id # ActiveList.new_uid
       end
 

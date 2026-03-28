@@ -158,6 +158,11 @@ ActiveList = {}
 
   # Select row
   $(document).on "click", "*[data-list-source] td>input[data-list-selector]", (event) ->
+    mainCheckbox = $("input[data-list-selector]").first()
+    someChecked = $("*[data-list-source] td>input[data-list-selector]:checked").length > 0
+    someUnchecked = $("*[data-list-source] td>input[data-list-selector]:not(:checked)").length > 0
+    mainCheckbox.prop("indeterminate", someChecked && someUnchecked);
+    mainCheckbox.prop("checked", someChecked || !someUnchecked);
     AL.select $(this)
     true
 

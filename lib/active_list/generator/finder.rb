@@ -10,8 +10,8 @@ module ActiveList
         @table.options[:order] = (columns.any? ? columns.first.name.to_sym : { id: :desc })
       end
 
-      class_name = @table.model.name
-      class_name = "(controller_name != '#{class_name.tableize}' ? controller_name.to_s.classify.constantize : #{class_name})" if collection?
+      class_name = "options[\"constant_name\"]&.constantize || #{@table.model.name}"
+      class_name = "(controller_name != '#{class_name.tableize}' && !options[\"constant_name\"] ? controller_name.to_s.classify.constantize : #{class_name})" if collection?
 
       # Find data
       query_code = class_name.to_s
@@ -62,6 +62,64 @@ module ActiveList
 
       code << "#{records_variable_name} = #{query_code} || {}\n"
       code
+    end
+
+    def exportable_query_code(options = {})
+      unless @table.options.keys.include?(:order)
+        columns = @table.table_columns
+        @table.options[:order] = (columns.any? ? columns.first.name.to_sym : { id: :desc })
+      end
+
+      class_name = "options[\"constant_name\"]&.constantize || #{@table.model.name}"
+      class_name = "(controller_name != '#{class_name.tableize}' && !options[\"constant_name\"] ? controller_name.to_s.classify.constantize : #{class_name})" if collection?
+
+      code = ''
+
+      code << "query = #{class_name}.to_s\n"
+      code << "query << #{scope_code.inspect}\n" if scope_code
+
+      if select_code
+        code << "select = #{select_code}\n"
+        code << "query << \".select(\"\n"
+        code << "query << select.inspect\n"
+        code << "query << \")\"\n"
+      end
+
+      if from_code
+        code << "from = #{from_code}\n"
+        code << "query << \".from(\"\n"
+        code << "query << from.inspect\n"
+        code << "query << \")\"\n"
+      end
+
+      unless @table.options[:conditions].blank?
+        code << "condition = #{conditions_code}\n"
+        code << "query << \".where(\"\n"
+        code << "query << condition.inspect\n"
+        code << "query << \")\"\n"
+      end
+
+      code << "query << \".joins(#{@table.options[:joins].inspect})\"\n" unless @table.options[:joins].blank?
+
+      unless includes_reflections.empty?
+        expr = includes_reflections.inspect[1..-2]
+        code << "query << \".includes(#{expr})\"\n"
+        code << "query << \".references(#{expr})\"\n"
+      end
+
+      unless @table.options[:group].blank?
+        code << "group = #{@table.options[:group].inspect}\n"
+        code << "query << \".group(\"\n"
+        code << "query << group.inspect\n"
+        code << "query << \")\"\n"
+      end
+
+      code << "order = #{var_name(:order)}\n"
+      code << "query << \".reorder(\"\n"
+      code << "query << order.inspect\n"
+      code << "query << \")\"\n"
+
+      code.c
     end
 
     protected
@@ -144,7 +202,7 @@ module ActiveList
       else
         code << "#{@table.model.table_name}.*"
       end
-      ("'" + code + "'").c
+      ('"' + code + '"').c
     end
 
     def sanitize_condition(value)

@@ -94,7 +94,7 @@ module ActiveList
             url[:redirect] ||= 'params[:redirect]'.c
             url.delete_if { |_k, v| v.nil? }
             cases << "#{record}.#{@name} == #{expected.inspect}\nlink_to(content_tag(:i) + h(#{url[:action].inspect}.t(scope: 'rest.actions'))"\
-                     ', {' + url.collect { |k, v| "#{k}: " + urlify(v, record) }.join(', ') + format + '}' \
+                     ', {' + url.collect { |k, v| "#{k}: " + urlify(k, v, record) }.join(', ') + format + '}' \
                                                                                                        ", {class: '#{@options[:icon_name] || @name}'" + link_options + '}'\
                                                                                                                                                ")\n"
           end
@@ -108,7 +108,7 @@ module ActiveList
           url[:id] = 'RECORD.id'.c if url[:id] == ID_PLACEHOLDER
           url[:redirect] ||= 'params[:redirect]'.c
           url.delete_if { |_k, v| v.nil? }
-          url = '{' + url.collect { |k, v| "#{k}: " + urlify(v, record) }.join(', ') + format + '}'
+          url = '{' + url.collect { |k, v| "#{k}: " + urlify(k, v, record) }.join(', ') + format + '}'
           code = "{class: '#{@options[:icon_name] || @name}'" + link_options + '}'
           code = "link_to(content_tag(:i) + h(' ' + :#{action}.t(scope: 'rest.actions')), " + url + ', ' + code + ')'
         end
