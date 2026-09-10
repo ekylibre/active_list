@@ -5,7 +5,7 @@ module ActiveList
 
       def header_code
         if @options[:label]
-          "#{@options[:label].to_s.strip.inspect}.t(scope: 'labels')".c
+          "::I18n.translate(#{@options[:label].to_s.strip.inspect}, scope: 'labels')".c
         else
           "#{@table.model.name}.human_attribute_name(#{@name.inspect})".c
         end

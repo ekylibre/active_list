@@ -60,7 +60,7 @@ module ActiveList
       def operation(record = 'record_of_the_death')
         link_options = ''
         if @options[:confirm]
-          link_options << ", 'data-confirm' => #{(@options[:confirm]).inspect}.t(scope: 'labels')"
+          link_options << ", 'data-confirm' => ::I18n.translate(#{(@options[:confirm]).inspect}, scope: 'labels')"
         end
         if @options[:method]
           link_options << ", method: :#{@options[:method].to_s.underscore}"
@@ -93,7 +93,7 @@ module ActiveList
             url[:id] = 'RECORD.id'.c if url[:id] == ID_PLACEHOLDER
             url[:redirect] ||= 'params[:redirect]'.c
             url.delete_if { |_k, v| v.nil? }
-            cases << "#{record}.#{@name} == #{expected.inspect}\nlink_to(content_tag(:i) + h(#{url[:action].inspect}.t(scope: 'rest.actions'))"\
+            cases << "#{record}.#{@name} == #{expected.inspect}\nlink_to(content_tag(:i) + h(::I18n.translate(#{url[:action].inspect}, scope: 'rest.actions'))"\
                      ', {' + url.collect { |k, v| "#{k}: " + urlify(k, v, record) }.join(', ') + format + '}' \
                                                                                                        ", {class: '#{@options[:icon_name] || @name}'" + link_options + '}'\
                                                                                                                                                ")\n"
@@ -110,7 +110,7 @@ module ActiveList
           url.delete_if { |_k, v| v.nil? }
           url = '{' + url.collect { |k, v| "#{k}: " + urlify(k, v, record) }.join(', ') + format + '}'
           code = "{class: '#{@options[:icon_name] || @name}'" + link_options + '}'
-          code = "link_to(content_tag(:i) + h(' ' + :#{action}.t(scope: 'rest.actions')), " + url + ', ' + code + ')'
+          code = "link_to(content_tag(:i) + h(' ' + ::I18n.translate(:#{action}, scope: 'rest.actions')), " + url + ', ' + code + ')'
         end
         if @options[:if]
           code = 'if ' + recordify!(@options[:if], record) + "\n" + code.dig + 'end'

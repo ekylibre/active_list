@@ -16,13 +16,15 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
   spec.required_ruby_version = '>= 1.9.3'
 
-  spec.add_dependency 'arel', ['>= 5.0.0']
   spec.add_dependency 'code_string', ['>= 0.0.1']
   spec.add_dependency 'i18n-complements', ['>= 0']
   spec.add_dependency 'onoma', '~> 0.4'
-  spec.add_dependency 'rails', ['>= 3.2', '< 6']
+  # Borne relâchée pour traverser les paliers du lot B (plan v6 d'Ekylibre).
+  # `active_list` est condamnée par ADR-6.2 et disparaîtra avec le front au
+  # lot G : l'objectif n'est pas de la porter mais de l'empêcher de bloquer la
+  # montée. Le plancher passe de 3.2 à 5.2, la seule version réellement testée.
+  spec.add_dependency 'rails', ['>= 5.2', '< 9']
   spec.add_dependency 'rodf', '~> 1.1'
-  spec.add_dependency 'rubyzip', ['>= 1.0']
 
   spec.add_development_dependency('sqlite3', ['~> 1.3.6'])
 end

@@ -3,7 +3,7 @@ module ActiveList
     class EmptyColumn < AbstractColumn
 
       def header_code
-        "#{name.to_s.strip.inspect}.t(scope: 'labels')".c
+        "::I18n.translate(#{name.to_s.strip.inspect}, scope: 'labels')".c
       end
     end
   end
