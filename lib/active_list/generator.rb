@@ -54,8 +54,12 @@ module ActiveList
       code << "  end\n"
       # Save preferences of user
       if defined?(User) && User.instance_methods.include?(:preference)
-        code << "  p = current_user.preference('list.#{view_method_name}', YAML::dump({}))\n"
-        code << "  p.set! YAML::dump(#{var_name(:params)}.stringify_keys)\n"
+        code << "  p = current_user.preference('list.#{view_method_name}', YAML.dump({}))\n"
+        # `to_h.deep_stringify_keys` ramène la préférence à un Hash de scalaires :
+        # les paramètres arrivent en `HashWithIndifferentAccess` (via
+        # `params.to_unsafe_h`) et Psych en gravait la classe dans la colonne,
+        # que la relecture restreinte de Psych 4 refuse ensuite.
+        code << "  p.set! YAML.dump(#{var_name(:params)}.to_h.deep_stringify_keys)\n"
       end
       code << "end\n"
       # code.split("\n").each_with_index{|l, x| puts((x+1).to_s.rjust(4)+": "+l)}
@@ -87,8 +91,16 @@ module ActiveList
       # For Rails 5
       code << "options.update(params.to_unsafe_h)\n"
       if defined?(User) && User.instance_methods.include?(:preference)
-        code << "#{var_name(:params)} = YAML::load(current_user.preference('list.#{view_method_name}', YAML::dump({})).value).symbolize_keys\n"
+        # Psych 4 restreint `YAML.load` aux scalaires : la liste blanche couvre
+        # les symboles que ces préférences contiennent, et le secours écarte
+        # celles écrites avant cette bascule, qui portent la classe du hash.
+        code << "#{var_name(:params)} = begin\n"
+        code << "  YAML.safe_load(current_user.preference('list.#{view_method_name}', YAML.dump({})).value, permitted_classes: [Symbol], aliases: true)\n"
+        code << "rescue Psych::Exception\n"
+        code << "  {}\n"
+        code << "end\n"
         code << "#{var_name(:params)} = {} unless #{var_name(:params)}.is_a?(Hash)\n"
+        code << "#{var_name(:params)} = #{var_name(:params)}.symbolize_keys\n"
       else
         code << "#{var_name(:params)} = {}\n"
       end
